@@ -3,6 +3,9 @@ use experimental 'class';
 
 class Minima::App;
 
+field $env      :param(environment);
+field $config   :param(configuration) :reader = {};
+
 method run
 {
     [

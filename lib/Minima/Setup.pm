@@ -6,6 +6,9 @@ use Minima::App;
 
 sub init ($env)
 {
-    my $app = Minima::App->new;
+    my $app = Minima::App->new(
+        environment => $env,
+        configuration => {},
+    );
     $app->run;
 }
