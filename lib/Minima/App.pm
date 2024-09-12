@@ -15,6 +15,8 @@ ADJUST {
     $self->_load_routes;
 }
 
+method development { $ENV{PLACK_ENV} eq 'development' }
+
 method run
 {
     my $m = $router->match($env);
