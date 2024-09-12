@@ -26,7 +26,11 @@ method run
 
     $self->_load_class($class);
 
-    my $controller = $class->new;
+    my $controller = $class->new(
+        environment => $env,
+        app => $self,
+        route => $m,
+    );
 
     $controller->$method;
 }

@@ -3,6 +3,10 @@ use experimental 'class';
 
 class Minima::Controller;
 
+field $env      :param(environment);
+field $app      :param;
+field $route    :param = {};
+
 method home
 {
     [
@@ -15,8 +19,8 @@ method home
 method not_found
 {
     [
-	404,
-	[ 'Content-Type' => 'text/plain' ],
-	[ "not found\n" ]
+        404,
+        [ 'Content-Type' => 'text/plain' ],
+        [ "not found\n" ]
     ]
 }
