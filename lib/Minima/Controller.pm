@@ -11,3 +11,12 @@ method home
         [ "hello, world\n" ]
     ]
 }
+
+method not_found
+{
+    [
+	404,
+	[ 'Content-Type' => 'text/plain' ],
+	[ "not found\n" ]
+    ]
+}

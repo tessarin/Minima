@@ -8,10 +8,11 @@ use Path::Tiny;
 use Router::Simple;
 
 field $router = Router::Simple->new;
+field %special;
 
 method match ($env)
 {
-    $router->match($env);
+    $router->match($env) // $special{not_found};
 }
 
 method read_file ($file)
@@ -36,7 +37,13 @@ method read_file ($file)
         my %opt;
         $opt{method} = $method unless $method eq '*';
 
-        # Add to router
-        $router->connect($pattern, \%dest, \%opt);
+        # Test the nature of the route
+        if ($method eq '@') {
+            # Special
+            $special{$pattern} = \%dest;
+        } else {
+            # Regular
+            $router->connect($pattern, \%dest, \%opt);
+        }
     }
 }
