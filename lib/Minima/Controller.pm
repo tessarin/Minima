@@ -34,3 +34,25 @@ method not_found
     $response->body("not found\n");
     $response->finalize;
 }
+
+method redirect ($url, $code = 302)
+{
+    $response->redirect($url, $code);
+    $response->finalize;
+}
+
+method print_env
+{
+    return $self->redirect('/') unless $app->development;
+
+    my $max = 0;
+    for (map { length } keys %$env) {
+        $max = $_ if $_ > $max;
+    }
+    $response->body(
+        map {
+            sprintf "%*s => %s\n", -$max, $_, $env->{$_}
+        } sort keys %$env
+    );
+    $response->finalize;
+}
