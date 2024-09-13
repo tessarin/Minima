@@ -41,6 +41,12 @@ method redirect ($url, $code = 302)
     $response->finalize;
 }
 
+method render ($v, $data = {})
+{
+    $response->body($v->render($data));
+    $response->finalize;
+}
+
 method print_env
 {
     return $self->redirect('/') unless $app->development;
