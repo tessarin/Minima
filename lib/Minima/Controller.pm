@@ -41,18 +41,24 @@ method redirect ($url, $code = 302)
     $response->finalize;
 }
 
+method render ($v, $data = {})
+{
+    $response->body($v->render($data));
+    $response->finalize;
+}
+
 method print_env
 {
     return $self->redirect('/') unless $app->development;
 
     my $max = 0;
     for (map { length } keys %$env) {
-	$max = $_ if $_ > $max;
+        $max = $_ if $_ > $max;
     }
     $response->body(
-	map {
-	    sprintf "%*s => %s\n", -$max, $_, $env->{$_}
-	} sort keys %$env
+        map {
+            sprintf "%*s => %s\n", -$max, $_, $env->{$_}
+        } sort keys %$env
     );
     $response->finalize;
 }
