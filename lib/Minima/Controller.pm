@@ -6,13 +6,13 @@ class Minima::Controller;
 use Plack::Request;
 use Plack::Response;
 
-field $env      :param(environment);
-field $app      :param;
-field $route    :param = {};
+field $env      :param(environment) :reader;
+field $app      :param :reader;
+field $route    :param :reader = {};
 
-field $request;
-field $response;
-field $params;
+field $request  :reader;
+field $response :reader;
+field $params   :reader;
 
 ADJUST {
     $request  = Plack::Request->new($env);
