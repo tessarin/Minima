@@ -8,7 +8,7 @@ use Path::Tiny;
 use Template;
 
 field $app                  :param;
-field $directory;
+field $directory            = 'templates';
 field $template;
 
 field %settings = (
@@ -49,8 +49,16 @@ method set_compound_title ($t, $d = undef)
     );
 }
 
-method set_directory      ($d) { $directory = path($d)->absolute }
-method set_template       ($t) { $template = $t }
+method set_directory ($d)
+{
+    $directory = path($d)->absolute
+}
+
+method set_template ($t)
+{
+    $t = "$t.tt" unless $t =~ /\.\w+$/;
+    $template = $t
+}
 
 method set_block_indexing ($n = 1) { $settings{block_indexing} = $n }
 method set_name_as_class  ($n = 1) { $settings{name_as_class} = $n }
@@ -91,7 +99,8 @@ method render ($data)
 
     for my $t (@{ $content{pre} }, $template, @{ $content{post} }) {
         $r = $tt->process($t, $data, \$body);
-        croak "Failed to load template `$t`: ", $tt->error, "\n" unless $r;
+        croak "Failed to load template `$t` (at `$directory`): ",
+              $tt->error, "\n" unless $r;
     }
 
     $body;
