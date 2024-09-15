@@ -34,7 +34,27 @@ method run
         route => $m,
     );
 
-    $controller->$method;
+    try {
+        $controller->$method;
+    } catch ($e) {
+        my $err = $router->error_route;
+        # Something failed. If we're in production
+        # and there is a server_error route, try it.
+        if (!$self->development && $err) {
+            $class  = $err->{controller};
+            $method = $err->{action};
+            $self->_load_class($class);
+            $controller = $class->new(
+                environment => $env,
+                app => $self,
+                route => $err,
+            );
+            $controller->$method($e);
+        } else {
+            # Nothing can be done, re-throw
+            die $e;
+        }
+    }
 }
 
 method not_found

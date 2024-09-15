@@ -47,3 +47,8 @@ method read_file ($file)
         }
     }
 }
+
+method error_route
+{
+    $special{server_error}
+}
