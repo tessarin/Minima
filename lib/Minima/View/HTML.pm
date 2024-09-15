@@ -6,6 +6,7 @@ class Minima::View::HTML;
 use Carp;
 use Path::Tiny;
 use Template;
+use Template::Constants qw/ :debug /;
 
 field $app                  :param;
 field $directory            = 'templates';
@@ -89,12 +90,21 @@ method render ($data)
     }
     $vars{classes} = "@$classes";
 
-    # Render
-    my $tt = Template->new(
+    # Setup Template Toolkit:
+    # Create a default and overwrite with user configuration.
+    my %tt_default = (
         INCLUDE_PATH => $directory,
-        # XXX: Encoding and debug
+        OUTLINE_TAG => '%%',
+        ANYCASE => 1,
     );
+    if ($app->development) {
+        $tt_default{DEBUG} = DEBUG_UNDEF;
+    }
+    my $tt_app_config = $app->config->{tt} // {};
+    my %tt_config = ( %tt_default, %$tt_app_config );
+    my $tt = Template->new(\%tt_config);
 
+    # Render
     my ( $body, $r );
 
     for my $t (@{ $content{pre} }, $template, @{ $content{post} }) {
