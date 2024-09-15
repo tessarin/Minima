@@ -22,7 +22,7 @@ ADJUST {
     $params = $request->parameters;
 }
 
-method home
+method hello
 {
     $response->body("hello, world\n");
     $response->finalize;
