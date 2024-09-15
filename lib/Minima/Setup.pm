@@ -12,6 +12,7 @@ sub import
 {
     shift; # discard package name
     my $file = shift if @_;
+    my $default_config = './etc/config.pl';
 
     if ($file) {
         my $file_abs = path($file)->absolute;
@@ -24,6 +25,10 @@ sub import
 
         croak "Config is not a hash reference.\n"
             unless ref $config eq ref {};
+    } elsif (-e $default_config) {
+        $config = do $default_config;
+        croak "Failed to parse default config file `$default_config`: "
+            . "$@\n" if $@;
     }
 }
 
