@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+use v5.40;
+
+use Getopt::Long qw/ :config bundling pass_through /;
+use Pod::Usage;
+
+use Minima::App;
+use Minima::Project;
+
+my $help;
+my $version;
+my $command;
+
+GetOptions(
+    'h|help!' => \$help,
+    'v|version!' => \$version,
+);
+
+# Preliminary
+pod2usage(-exitval => 0, -verbose => 2) if $help;
+say 'Minima v', $Minima::App::VERSION and exit if $version;
+
+# Commands
+$command = shift @ARGV // 'nop';
+
+if ($command eq 'new') {
+    # TODO: Do something :-)
+} else {
+    pod2usage(1);
+}
+
+__END__
+
+=head1 NAME
+
+B<minima> -- Manage web applications using Minima.
+
+=head1 SYNOPSIS
+
+    minima [command] [options] [args..]
+
+    minima new [name]
+
+=head1 DESCRIPTION
+
+The B<minima> script provides a command-line interface to manage
+projects built with the L<Minima> web framework.
+
+=head1 OPTIONS
+
+The following global options are available and can be used with any
+command:
+
+=over 8
+
+=item B<-h>, B<--help>
+
+Show the manual page.
+
+=item B<-v>, B<--version>
+
+Show version information.
+
+=back
+
+=head1 COMMANDS
+
+=head2 new I<[name]>
+
+Create a new project using the standard Minima template.
+
+If F<name> is provided, a new directory with the given name will be
+created. If no F<name> is provided, the project will be created in the
+current directory. The specified directory must be empty.
+
+=head1 SEE ALSO
+
+L<Minima> -- The web framework used by B<minima>.
+
+=head1 AUTHOR
+
+Cesar Tessarin, <cesar@tessarin.com.br>.
