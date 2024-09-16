@@ -23,13 +23,13 @@ sub import
         $config = do $file_abs;
         croak "Failed to parse config file `$file`: $@\n" if $@;
 
-        croak "Config is not a hash reference.\n"
-            unless ref $config eq ref {};
     } elsif (-e $default_config) {
         $config = do $default_config;
         croak "Failed to parse default config file `$default_config`: "
             . "$@\n" if $@;
     }
+    croak "Config is not a hash reference.\n"
+        unless ref $config eq ref {};
 }
 
 sub init ($env)
