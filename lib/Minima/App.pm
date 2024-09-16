@@ -1,7 +1,7 @@
 use v5.40;
 use experimental 'class';
 
-class Minima::App;
+class Minima::App 0.001000;
 
 use Carp;
 use Minima::Router;
