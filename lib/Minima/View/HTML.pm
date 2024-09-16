@@ -57,8 +57,7 @@ method set_directory ($d)
 
 method set_template ($t)
 {
-    $t = "$t.tt" unless $t =~ /\.\w+$/;
-    $template = $t
+    $template = _ext($t);
 }
 
 method set_block_indexing ($n = 1) { $settings{block_indexing} = $n }
@@ -66,29 +65,29 @@ method set_name_as_class  ($n = 1) { $settings{name_as_class} = $n }
 
 method add_header_script  ($s) { push @{$content{header_scripts}}, $s }
 method add_header_css     ($c) { push @{$content{header_css}}, $c }
-method add_pre            ($p) { push @{$content{pre}}, $p }
-method add_post           ($p) { push @{$content{post}}, $p }
+method add_pre            ($p) { push @{$content{pre}}, _ext($p) }
+method add_post           ($p) { push @{$content{post}}, _ext($p) }
 method add_pre_body       ($p) { push @{$content{pre_body}}, $p }
 method add_script         ($s) { push @{$content{scripts}}, $s }
 method add_class          ($c) { push @{$content{classes}}, $c }
 
-method render ($data)
+method render ($data = {})
 {
     croak "No template set." unless $template;
-    croak "No template directory set." unless $directory;
 
     # Build vars to send to template
     my %vars = ( %content, settings => \%settings );
     $data->{view} = \%vars;
 
     # Format CSS classes
-    my $classes = $content{classes};
+    my @classes = @{ $content{classes} };
     if ($settings{name_as_class}) {
-        my $clean_name = $content{title};
+        my $clean_name = $template;
+        $clean_name =~ s/\.\w+$//;
         $clean_name =~ tr/./-/;
-        push @$classes, $clean_name;
+        push @classes, $clean_name;
     }
-    $vars{classes} = "@$classes";
+    $vars{classes} = "@classes";
 
     # Setup Template Toolkit:
     # Create a default and overwrite with user configuration.
@@ -114,4 +113,9 @@ method render ($data)
     }
 
     $body;
+}
+
+sub _ext ($file)
+{
+    $file = "$file.tt" unless $file =~ /\.\w+$/;
 }
