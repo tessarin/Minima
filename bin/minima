@@ -24,7 +24,7 @@ say 'Minima v', $Minima::App::VERSION and exit if $version;
 $command = shift @ARGV // 'nop';
 
 if ($command eq 'new') {
-    # TODO: Do something :-)
+    Minima::Project::create(shift @ARGV);
 } else {
     pod2usage(1);
 }
