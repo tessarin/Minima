@@ -4,6 +4,7 @@ use v5.40;
 use Getopt::Long qw/ :config bundling pass_through /;
 use Pod::Usage;
 
+use IO::Socket::INET;
 use Minima::App;
 use Minima::Project;
 
@@ -15,6 +16,8 @@ GetOptions(
     'h|help!' => \$help,
     'v|version!' => \$version,
 );
+# From here on, commands must give the final word on passed options
+Getopt::Long::Configure('no_pass_through');
 
 # Preliminary
 pod2usage(-exitval => 0, -verbose => 2) if $help;
@@ -24,34 +27,66 @@ say 'Minima v', $Minima::App::VERSION and exit if $version;
 $command = shift @ARGV // 'nop';
 
 if ($command eq 'new') {
-    Minima::Project::create(shift @ARGV);
+    my %config;
+    GetOptions(
+	\%config,
+	'static|s!',
+	'verbose!',
+    );
+    Minima::Project::create(shift @ARGV, \%config);
+} elsif ($command eq 'run') {
+    # Attempt to find a free port
+    my $port = 5000;
+    while (++$port < 2**16) {
+	my $sock = IO::Socket::INET->new(
+	    PeerAddr => '127.0.0.1',
+	    PeerPort => $port,
+	    Proto => 'tcp',
+	    Timeout => 5,
+	);
+	last unless defined $sock;
+    }
+
+    my @plackup = qw(
+	plackup
+	app.psgi
+	--reload
+	--access-log /dev/null
+	--port
+    );
+    push @plackup, "localhost:$port";
+    push @plackup, @ARGV;
+
+    exec @plackup;
+    die "Failed to execute plackup.\n";
 } else {
-    pod2usage(1);
+    # No valid command passed
+    pod2usage(
+	-verbose => 99,
+	-sections => 'SYNOPSIS|GLOBAL OPTIONS',
+    );
 }
 
 __END__
 
 =head1 NAME
 
-B<minima> -- Manage web applications using Minima.
+minima -- Manage web applications using Minima.
 
 =head1 SYNOPSIS
 
-    minima [command] [options] [args..]
+    minima [command] [-hv] [args..]
 
-    minima new [name]
+    minima new [options] [name]
 
 =head1 DESCRIPTION
 
 The B<minima> script provides a command-line interface to manage
 projects built with the L<Minima> web framework.
 
-=head1 OPTIONS
+=head1 GLOBAL OPTIONS
 
-The following global options are available and can be used with any
-command:
-
-=over 8
+=over 4
 
 =item B<-h>, B<--help>
 
@@ -65,13 +100,40 @@ Show version information.
 
 =head1 COMMANDS
 
-=head2 new I<[name]>
+=head2 new I<name> [options]
 
 Create a new project using the standard Minima template.
 
 If F<name> is provided, a new directory with the given name will be
 created. If no F<name> is provided, the project will be created in the
 current directory. The specified directory must be empty.
+
+=head3 Options
+
+All options can be inverted by using the C<no-> prefix.
+
+=over 4
+
+=item B<--static, -s> I<(default: true)>
+
+Enables the middleware to serve static files from the F<static/>
+directory during development.
+
+=item B<--verbose> I<(default: false)>
+
+Outputs directories and files as they are created.
+
+=back
+
+=head2 run [options]
+
+Runs the current F<app.psgi> by automatically detecting the next
+available port after 5000 and forwarding the command to L<plackup>.
+Equivalent to:
+
+    plackup --reload --port <port> --access-log /dev/null app.psgi
+
+Any options passed to B<run> are forwarded directly to plackup.
 
 =head1 SEE ALSO
 
@@ -80,3 +142,5 @@ L<Minima> -- The web framework used by B<minima>.
 =head1 AUTHOR
 
 Cesar Tessarin, <cesar@tessarin.com.br>.
+
+Written in September 2024.
