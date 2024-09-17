@@ -91,6 +91,9 @@ method render ($data = {})
     }
     $vars{classes} = "@classes";
 
+    # If any var is undef, replace with empty string
+    $vars{$_} //= '' for keys %vars;
+
     # Setup Template Toolkit:
     # Create a default and overwrite with user configuration.
     my %tt_default = (
