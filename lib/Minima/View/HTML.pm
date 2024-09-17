@@ -15,6 +15,7 @@ field $template;
 field %settings = (
     block_indexing => 1,    # block robots with a <meta>
     name_as_class => 1,     # include template name in @classes
+    theme_color => '',      # hex color for the <meta theme-color>
 );
 
 field %content = (
@@ -34,6 +35,7 @@ ADJUST {
 
     $content{title} = $config->{default_title} // '';
     $settings{block_indexing} = $config->{block_indexing} // 1;
+    $settings{theme_color} = $config->{theme_color} // '';
 }
 
 method set_title ($t, $d = undef)
