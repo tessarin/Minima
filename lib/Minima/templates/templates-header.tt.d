@@ -13,7 +13,9 @@
 %% if view.settings.theme_color
   <meta name="theme-color" content="[% view.theme_color %]">
 %% end
+@@ IF static
   <link rel="stylesheet" href="/css/main.css" />
+@@ END
 </head>
 <body>
 
