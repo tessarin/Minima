@@ -15,7 +15,12 @@ ADJUST {
     $self->_load_routes;
 }
 
-method development { $ENV{PLACK_ENV} eq 'development' }
+method development
+{
+    return 1 if not defined $ENV{PLACK_ENV};
+
+    $ENV{PLACK_ENV} eq 'development'
+}
 
 method run
 {
