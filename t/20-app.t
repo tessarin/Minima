@@ -85,7 +85,7 @@ my $env = { PATH_INFO => '/' };
         lives {
             $app = Minima::App->new(
                 environment => $env,
-                configuration => $config,
+                configuration => $config
             )
         },
         'loads custom routes file'
@@ -120,6 +120,83 @@ my $env = { PATH_INFO => '/' };
         lives { $app->_load_class('Nested::Class') },
         'loads nested class'
     ) or note($@);
+}
+
+# Internal _set_version
+{
+    # sets the default version
+    my $app = Minima::App->new(
+        environment => {},
+    );
+
+    is(
+        $app->config->{VERSION},
+        Minima::App::DEFAULT_VERSION,
+        'sets a default version'
+    );
+
+    # respects a manually set version
+    $app = Minima::App->new(
+        environment => {},
+        configuration => { VERSION => 'SecretVersion' }
+    );
+
+    is(
+        $app->config->{VERSION},
+        'SecretVersion',
+        'respects a manually set version'
+    );
+
+    # recognizes from class
+    my $class = $dir->child('V.pm');
+    $class->spew(<<~'EOF'
+        use v5.40;
+        use experimental 'class';
+        class V 1.234567 { }
+        EOF
+    );
+    local @INC = ( $dir->absolute, @INC );
+    $app = Minima::App->new(
+        environment => {},
+        configuration => { version_from => 'V' }
+    );
+
+    is(
+        $app->config->{VERSION},
+        '1.234567',
+        'recognizes version from class'
+    );
+
+    # dies for bad class passed
+    like(
+        dies {
+            $app = Minima::App->new(
+                environment => {},
+                configuration => { version_from => 'W' }
+            )
+        },
+        qr/failed.*version/i,
+        'dies for unreadable class to extract version'
+    );
+
+    # sets a default for class without version
+    my $new_class = $dir->child('X.pm');
+    $new_class->spew(<<~'EOF'
+        use v5.40;
+        use experimental 'class';
+        class X { }
+        EOF
+    );
+    $app = Minima::App->new(
+        environment => {},
+        configuration => { version_from => 'X' }
+    );
+
+    is(
+        $app->config->{VERSION},
+        Minima::App::DEFAULT_VERSION,
+        'sets default for class without version'
+    );
 }
 
 # Routes properly

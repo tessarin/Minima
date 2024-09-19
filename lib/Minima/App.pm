@@ -6,6 +6,8 @@ class Minima::App 0.001000;
 use Carp;
 use Minima::Router;
 
+use constant DEFAULT_VERSION => 'prototype';
+
 field $env      :param(environment);
 field $config   :param(configuration) :reader = {};
 
@@ -13,6 +15,7 @@ field $router = Minima::Router->new;
 
 ADJUST {
     $self->_load_routes;
+    $self->_set_version;
 }
 
 method development
@@ -101,5 +104,22 @@ method _load_class ($class)
         require "$file.pm";
     } catch ($e) {
         croak "Could not load `$class`: $e\n";
+    }
+}
+
+method _set_version
+{
+    return if defined $config->{VERSION};
+
+    if (defined $config->{version_from}) {
+        my $class = $config->{version_from};
+        try {
+            $self->_load_class($class);
+        } catch ($e) {
+            croak "Failed to load version from class.\n$e\n";
+        }
+        $config->{VERSION} = $class->VERSION // DEFAULT_VERSION;
+    } else {
+        $config->{VERSION} = DEFAULT_VERSION;
     }
 }
