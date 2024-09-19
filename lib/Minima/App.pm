@@ -73,7 +73,23 @@ method not_found
 
 method _load_routes
 {
-    my $file = $config->{routes} // './etc/routes.map';
+    my $file = $config->{routes};
+    unless (defined $file) {
+        # No file passed. Attempt the default route.
+        $file = './etc/routes.map';
+        # If it does not exist, setup a basic route
+        # for the default controller only.
+        unless (-e $file) {
+            $router->_connect(
+                '/',
+                {
+                    controller => 'Minima::Controller',
+                    action => 'hello',
+                },
+            );
+            return;
+        }
+    }
     $router->read_file($file);
 }
 
