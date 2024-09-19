@@ -1,6 +1,6 @@
 # Main Routes
-GET     /               Controller::Main        home
+GET     /               :Main       home
 
 # Specials
-@       not_found       Controller::Main        not_found
-@       server_error    Controller::Main        error
+@       not_found       :Main       not_found
+@       server_error    :Main       error
