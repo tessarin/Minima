@@ -16,6 +16,7 @@ field %settings = (
     block_indexing => 1,    # block robots with a <meta>
     name_as_class => 1,     # include template name in @classes
     theme_color => '',      # hex color for the <meta theme-color>
+    include_extra => ['js'],# extra directories to use as include path
 );
 
 field %content = (
@@ -62,6 +63,11 @@ method set_template ($t)
     $template = _ext($t);
 }
 
+method add_include_path ($d)
+{
+    push @{ $settings{include_extra} }, path($d)->absolute;
+}
+
 method set_block_indexing ($n = 1) { $settings{block_indexing} = $n }
 method set_name_as_class  ($n = 1) { $settings{name_as_class} = $n }
 
@@ -97,7 +103,7 @@ method render ($data = {})
     # Setup Template Toolkit:
     # Create a default and overwrite with user configuration.
     my %tt_default = (
-        INCLUDE_PATH => $directory,
+        INCLUDE_PATH => [ $directory, @{ $settings{include_extra} } ],
         OUTLINE_TAG => '%%',
         ANYCASE => 1,
     );
