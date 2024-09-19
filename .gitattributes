@@ -1,0 +1,5 @@
+# Minima::Project Templates
+lib/Minima/templates/*.[sd] linguist-language=perl
+lib/Minima/templates/+gitignore.s linguist-language=gitignore
+lib/Minima/templates/templates-* linguist-language=html
+lib/Minima/templates/static-css-* linguist-language=css
