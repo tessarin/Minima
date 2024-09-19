@@ -82,3 +82,78 @@ sub _info ($m)
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Minima::Project - Backend for L<minima>, the project manager
+
+=head1 SYNOPSIS
+
+    use Minima::Project;
+
+    Minima::Project::create('app');
+
+=head1 DESCRIPTION
+
+This module is not intended to be used directly by third parties. It is
+the backend for L<minima(1)|minima>. No functions are exported by
+default.
+
+Templates used for generating projects reside in Minima's F<lib>, which
+is stored in a package variable named C<$tdir>. Templates can have two
+extensions:
+
+=over 4
+
+=item F<.s>
+
+Static templates, which are copied directly.
+
+=item F<.d>
+
+Dynamic templates, which are processed with
+L<Template::Toolkit|Template> and then copied.
+
+=back
+
+The C<.[sd]> extensions are removed and the template name is converted
+to a proper path by L<C<get_templates>|/get_templates>.
+
+=head1 SUBROUTINES
+
+=head2 create
+
+    sub create ($dir, $config)
+
+Creates a project at C<$dir> with the specified configuration, passed as
+a hash reference in C<$config>. The configuration is forwarded to the
+templates and is optional.
+
+If the directory is either not empty or not a directory at all, it dies.
+
+This subroutine calls L<C<get_templates>|/get_templates> to retrieve
+information about what needs to be generated and where.
+
+=head2 get_templates
+
+    sub get_templates ($config)
+
+Gets the available templates, processes them, and returns a hash
+reference containing the paths as keys and contents as values.
+
+Templates are stored in flattened files. This subroutine converts dashes
+to directory slashes and plus signs to dots, allowing all template files
+to be stored together in a visible structure, even if they represent
+hidden files.
+
+=head1 SEE ALSO
+
+L<Minima(3)|Minima>, L<minima(1)|minima>.
+
+=head1 AUTHOR
+
+Cesar Tessarin, <cesar@tessarin.com.br>.
+
+Written in September 2024.
