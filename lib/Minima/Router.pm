@@ -48,6 +48,11 @@ method read_file ($file)
     }
 }
 
+method _connect
+{
+    $router->connect(@_);
+}
+
 method error_route
 {
     $special{server_error}
