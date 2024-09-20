@@ -215,7 +215,11 @@ C<E<lt>bodyE<gt>>.
 
 =item C<classes>
 
-A list of CSS classes to be included in C<E<lt>mainE<gt>>.
+A list of CSS classes to be included in C<E<lt>mainE<gt>>. Before being
+passed to the view, the class list will be converted into a scalar (with
+classes separated by spaces). The template name is cleaned up, having
+its extension removed and any dots replaced by dashes (C<tr/./-/>) to be
+able to form valid CSS classes.
 
 =back
 
@@ -297,7 +301,7 @@ called, the default F<templates> directory will be used.
     method set_template ($title)
 
 Sets the template name to be used. If no extension is present, F<.tt>
-will be added.
+will be added. A dot (C<.>) must not be present in the template name.
 
 =head2 add_include_path
 
