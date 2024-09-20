@@ -93,7 +93,7 @@ making it readily available to controllers.
 
 This base class is not connected to any view, which is left to methods
 or subclasses. However, it sets a default C<Content-Type> header for the
-response as C<'text/plain; charset=utf-8'>.
+response as C<'text/plain; charset=utf-8'> and response code to 200.
 
 =head1 METHODS
 
