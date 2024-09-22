@@ -1,3 +1,9 @@
+use v5.40;
+package Minima 0.001;
+1;
+
+__END__
+
 =head1 NAME
 
 Minima - Efficient web framework built with modern core classes
