@@ -6,7 +6,7 @@ __END__
 
 =head1 NAME
 
-Minima -- Efficient web framework built with modern core classes
+Minima - Efficient web framework built with modern core classes
 
 =head1 SYNOPSIS
 
