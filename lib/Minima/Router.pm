@@ -189,6 +189,10 @@ match hash.
 
 =head1 METHODS
 
+=head2 new
+
+Constructs a new object. No arguments required.
+
 =head2 read_file
 
     method read_file ($file)
