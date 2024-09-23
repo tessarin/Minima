@@ -2,11 +2,13 @@ use v5.40;
 
 package Minima::Project;
 
-use FindBin;
+use File::Share;
 use Path::Tiny;
 use Template;
 
-our $tdir = path(__FILE__)->parent->child('/templates')->absolute;
+our $tdir = path(
+        File::Share::dist_dir(__PACKAGE__)
+    )->child('/templates');
 our $verbose = 0;
 
 sub create ($dir, $user_config = {})
