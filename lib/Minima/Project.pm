@@ -59,19 +59,19 @@ sub get_templates ($config)
         TAG_STYLE => 'star',
     );
 
-    foreach (glob "$tdir/*.[sd]") {
+    foreach (glob "$tdir/*.[sd]tpl") {
         my $content = path($_)->slurp_utf8;
         $_ = path($_)->basename;
         tr|-|/|;
         tr|+|.|;
-        if (/\.d/) {
+        if (/\.dtpl$/) {
             # Process .d(ynamic) template
             my $template = $content;
             my $processed;
             $tt->process(\$template, $config, \$processed);
             $content = $processed;
         }
-        s/\.\w$//;
+        s/\.\w+$//;
         $files{$_} = $content;
     }
 
@@ -107,13 +107,13 @@ Templates used for generating projects reside in Minima's F<lib>, which
 is stored in a package variable named C<$tdir>. Templates can have two
 extensions:
 
-=over 4
+=over 8
 
-=item F<.s>
+=item F<.stpl>
 
 Static templates, which are copied directly.
 
-=item F<.d>
+=item F<.dtpl>
 
 Dynamic templates, which are processed with
 L<Template::Toolkit|Template> and then copied.

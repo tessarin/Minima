@@ -1,5 +1,3 @@
-.gitignore
-.gitattributes
 bin/minima
 Build.PL
 eg/etc/routes.map
@@ -22,18 +20,18 @@ LICENSE
 MANIFEST                        This list of files
 README
 README.md
-share/templates/+gitignore.s
-share/templates/app.psgi.d
-share/templates/cpanfile.s
-share/templates/etc-config.pl.s
-share/templates/etc-routes.map.s
-share/templates/lib-Controller-Main.pm.s
-share/templates/static-css-main.css.d
-share/templates/templates-e404.tt.s
-share/templates/templates-e500.tt.s
-share/templates/templates-footer.tt.s
-share/templates/templates-header.tt.d
-share/templates/templates-home.tt.s
+share/templates/+gitignore.stpl
+share/templates/app.psgi.dtpl
+share/templates/cpanfile.stpl
+share/templates/etc-config.pl.stpl
+share/templates/etc-routes.map.stpl
+share/templates/lib-Controller-Main.pm.stpl
+share/templates/static-css-main.css.dtpl
+share/templates/templates-e404.tt.stpl
+share/templates/templates-e500.tt.stpl
+share/templates/templates-footer.tt.stpl
+share/templates/templates-header.tt.dtpl
+share/templates/templates-home.tt.stpl
 t/00-load.t
 t/01-setup.t
 t/02-router.t
