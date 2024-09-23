@@ -259,6 +259,12 @@ C<DEBUG_UNDEF>.
 
 =head1 METHODS
 
+=head2 new
+
+    method new (app)
+
+Constructs a new object. Requires a L<Minima::App> reference.
+
 =head2 render
 
     method render ($data = {})
