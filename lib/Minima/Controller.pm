@@ -105,7 +105,7 @@ Instantiates a controller with the given C<$app> reference, Plack
 environment and optionally the hash reference returned by the router.
 If this hash reference contains data extracted from the URI by
 L<Minima::Router>, then this data will be made available to the
-controller through the L<C<route|/route> field.
+controller through the L<C<route>|/route> field.
 
 =head2 redirect
 
