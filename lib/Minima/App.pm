@@ -29,7 +29,7 @@ method run
 {
     my $m = $router->match($env);
 
-    return $self->not_found unless $m;
+    return $self->_not_found unless $m;
 
     my $class  = $m->{controller};
     my $method = $m->{action};
@@ -65,7 +65,7 @@ method run
     }
 }
 
-method not_found
+method _not_found
 {
     [
         404,
