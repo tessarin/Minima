@@ -19,6 +19,12 @@ my $build = Module::Build->new(
         'Data::Dumper' => '2.1',
         'HTTP::Request::Common' => '6.0',
     },
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/tessarin/Minima',
+            bugtracker => 'https://github.com/tessarin/Minima/issues',
+        },
+    },
     license => 'mit',
 );
 
