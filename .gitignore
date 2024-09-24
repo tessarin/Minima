@@ -3,4 +3,6 @@ blib/
 _build/
 Build
 /MYMETA*
-MANIFEST.bak
+/META*
+/MANIFEST
+/MANIFEST.bak
