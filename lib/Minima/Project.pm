@@ -7,7 +7,7 @@ use Path::Tiny;
 use Template;
 
 our $tdir = path(
-        File::Share::dist_dir(__PACKAGE__)
+        File::Share::dist_dir('Minima')
     )->child('/templates');
 our $verbose = 0;
 
