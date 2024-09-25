@@ -59,6 +59,8 @@ sub get_templates ($config)
         TAG_STYLE => 'star',
     );
 
+    $config->{version} = Minima->VERSION;
+
     foreach (glob "$tdir/*.[sd]tpl") {
         my $content = path($_)->slurp_utf8;
         $_ = path($_)->basename;
