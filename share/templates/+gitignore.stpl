@@ -1,3 +1,3 @@
 # CPAN
-local/
-vendor/
+/local/
+/vendor/
