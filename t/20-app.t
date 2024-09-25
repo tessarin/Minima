@@ -39,7 +39,7 @@ my $env = { PATH_INFO => '/' };
     ok(
         lives { $app = Minima::App->new(environment => $env) },
         'runs without routes file'
-    );
+    ) or note ($@);
 
     my $response = $app->run;
     ok(
