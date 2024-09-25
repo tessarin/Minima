@@ -11,7 +11,7 @@
 %% end
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 %% if view.settings.theme_color
-  <meta name="theme-color" content="[% view.theme_color %]">
+  <meta name="theme-color" content="[% view.settings.theme_color %]">
 %% end
 %% if view.header_css ; foreach css in view.header_css
   <link rel="stylesheet" href="[% css %]" />
