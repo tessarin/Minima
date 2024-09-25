@@ -52,7 +52,7 @@ if ($command eq 'new') {
 	app.psgi
 	--reload
 	--access-log /dev/null
-	--port
+	--listen
     );
     push @plackup, "localhost:$port";
     push @plackup, @ARGV;
