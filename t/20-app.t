@@ -31,68 +31,6 @@ $class->spew(<<~'EOF'
 
 my $env = { PATH_INFO => '/' };
 
-# Load routes
-{
-    my $app;
-
-    # totally empty, no default and no custom
-    ok(
-        lives { $app = Minima::App->new(environment => $env) },
-        'runs without routes file'
-    ) or note ($@);
-
-    my $response = $app->run;
-    ok(
-        ( ref $response eq ref [] and $response->[0] == 200 ),
-        'routes root without a routes file'
-    );
-
-    $app = Minima::App->new(
-        environment => { PATH_INFO => '/ThisURIDoesNotExist' }
-    );
-    $response = $app->run;
-    ok(
-        ( ref $response eq ref [] and $response->[0] == 404 ),
-        'routes a bad URI without a routes file',
-    );
-
-    # pass a file that does not exist
-    like(
-        dies {
-            $app = Minima::App->new(
-                environment => $env,
-                configuration => { routes => 'ThisFileDoesNotExist' }
-            )
-        },
-        qr/routes.*not exist/i,
-        'dies for non-existing routes file'
-    );
-
-    # create one at the default location
-    my $routes = $dir->child('etc/routes.map');
-    $routes->spew();
-    ok(
-        lives { $app = Minima::App->new(environment => $env) },
-        'loads default routes file'
-    ) or note($@);
-    $routes->remove;
-
-    # custom location
-    my $custom_routes = $dir->child('etc/custom.map');
-    $custom_routes->spew(); # etc/custom.map
-    my $config = { routes => 'etc/custom.map' };
-    ok(
-        lives {
-            $app = Minima::App->new(
-                environment => $env,
-                configuration => $config
-            )
-        },
-        'loads custom routes file'
-    ) or note($@);
-    $custom_routes->remove;
-}
-
 # Internal _load_class
 {
     my $app = Minima::App->new(environment => $env);
@@ -197,6 +135,70 @@ my $env = { PATH_INFO => '/' };
         Minima::App::DEFAULT_VERSION,
         'sets default for class without version'
     );
+}
+
+# Load routes
+{
+    my $app;
+
+    # totally empty, no default and no custom
+    ok(
+        lives { $app = Minima::App->new(environment => $env) },
+        'runs without routes file'
+    ) or note ($@);
+
+    my $response = $app->run;
+    ok(
+        ( ref $response eq ref [] and $response->[0] == 200 ),
+        'routes root without a routes file'
+    );
+
+    $app = Minima::App->new(
+        environment => { PATH_INFO => '/ThisURIDoesNotExist' }
+    );
+    $response = $app->run;
+    ok(
+        ( ref $response eq ref [] and $response->[0] == 404 ),
+        'routes a bad URI without a routes file',
+    );
+
+    # pass a file that does not exist
+    like(
+        dies {
+            $app = Minima::App->new(
+                environment => $env,
+                configuration => { routes => 'ThisFileDoesNotExist' }
+            )
+        },
+        qr/routes.*not exist/i,
+        'dies for non-existing routes file'
+    );
+
+    # create one at the default location
+    my $routes = $dir->child('etc/routes.map');
+    $routes->spew("* / SecretA m\n");
+    like(
+        dies { $app = Minima::App->new(environment => $env); $app->run },
+        qr/SecretA/i, # should die complaining about this fake controller
+        'loads default routes file'
+    );
+    $routes->remove;
+
+    # custom location
+    my $custom_routes = $dir->child('etc/custom.map');
+    $custom_routes->spew("* / SecretB m"); # etc/custom.map
+    like(
+        dies {
+            $app = Minima::App->new(
+                environment => $env,
+                configuration => { routes => 'etc/custom.map' },
+            );
+            $app->run;
+        },
+        qr/SecretB/i, # should die complaining about this fake controller
+        'loads custom routes file'
+    );
+    $custom_routes->remove;
 }
 
 # Routes properly
