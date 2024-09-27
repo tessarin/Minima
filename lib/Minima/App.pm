@@ -8,7 +8,7 @@ use Minima::Router;
 
 use constant DEFAULT_VERSION => 'prototype';
 
-field $env      :param(environment);
+field $env      :param(environment)           = undef;
 field $config   :param(configuration) :reader = {};
 
 field $router = Minima::Router->new;
@@ -27,6 +27,8 @@ method development
 
 method run
 {
+    croak "Can't run without an environment.\n" unless defined $env;
+
     my $m = $router->match($env);
 
     return $self->_not_found unless $m;
@@ -176,7 +178,7 @@ response for the root path and a 404 for any other route.
 
 =item C<VERSION>
 
-The current application version. Instead of passing this directly, you
+The current application version. Instead of passing it directly, you
 can use the L<C<version_from>> key to auto-populate this. If neither
 C<VERSION> not C<version_from> are provided, it defaults to
 C<'prototype'>.
@@ -192,11 +194,11 @@ C<VERSION> wasn't given explicitly.
 
 =head2 new
 
-    method new (environment, configuration = {})
+    method new (environment = undef, configuration = {})
 
-Instantiates the app with the provided Plack environment and optional
-configuration hash. Configuration keys used by Minima::App are described
-under L</Configuration>.
+Instantiates the app with the provided Plack environment and
+configuration hash. Both parameters are optional. Configuration keys
+used by Minima::App are described under L</Configuration>.
 
 =head2 run
 

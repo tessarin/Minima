@@ -7,7 +7,6 @@ use Minima::View::HTML;
 $ENV{PLACK_ENV} = 'development';
 my $config = {};
 my $app = Minima::App->new(
-    environment => {},
     configuration => $config,
 );
 my $view = Minima::View::HTML->new(app => $app);
