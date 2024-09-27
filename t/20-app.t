@@ -33,7 +33,7 @@ my $env = { PATH_INFO => '/' };
 
 # Internal _load_class
 {
-    my $app = Minima::App->new(environment => $env);
+    my $app = Minima::App->new;
 
     like(
         dies { $app->_load_class('ThisClassDoesNotExist') },
@@ -63,9 +63,7 @@ my $env = { PATH_INFO => '/' };
 # Internal _set_version
 {
     # sets the default version
-    my $app = Minima::App->new(
-        environment => {},
-    );
+    my $app = Minima::App->new;
 
     is(
         $app->config->{VERSION},
@@ -75,7 +73,6 @@ my $env = { PATH_INFO => '/' };
 
     # respects a manually set version
     $app = Minima::App->new(
-        environment => {},
         configuration => { VERSION => 'SecretVersion' }
     );
 
@@ -95,7 +92,6 @@ my $env = { PATH_INFO => '/' };
     );
     local @INC = ( $dir->absolute, @INC );
     $app = Minima::App->new(
-        environment => {},
         configuration => { version_from => 'V' }
     );
 
@@ -109,7 +105,6 @@ my $env = { PATH_INFO => '/' };
     like(
         dies {
             $app = Minima::App->new(
-                environment => {},
                 configuration => { version_from => 'W' }
             )
         },
@@ -126,7 +121,6 @@ my $env = { PATH_INFO => '/' };
         EOF
     );
     $app = Minima::App->new(
-        environment => {},
         configuration => { version_from => 'X' }
     );
 
@@ -137,6 +131,17 @@ my $env = { PATH_INFO => '/' };
     );
 }
 
+# Initialization
+{
+    my $app = Minima::App->new;
+
+    like(
+        dies { $app->run },
+        qr/without.*environment/i,
+        'dies for undef environment'
+    );
+}
+
 # Load routes
 {
     my $app;
@@ -144,7 +149,7 @@ my $env = { PATH_INFO => '/' };
     # totally empty, no default and no custom
     ok(
         lives { $app = Minima::App->new(environment => $env) },
-        'runs without routes file'
+        'works without routes file'
     ) or note ($@);
 
     my $response = $app->run;
@@ -166,7 +171,6 @@ my $env = { PATH_INFO => '/' };
     like(
         dies {
             $app = Minima::App->new(
-                environment => $env,
                 configuration => { routes => 'ThisFileDoesNotExist' }
             )
         },
