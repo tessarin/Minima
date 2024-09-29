@@ -8,7 +8,7 @@ use Minima::Router;
 
 use constant DEFAULT_VERSION => 'prototype';
 
-field $env      :param(environment)           = undef;
+field $env      :param(environment)   :reader = undef;
 field $config   :param(configuration) :reader = {};
 
 field $router = Minima::Router->new;
@@ -205,7 +205,7 @@ used by Minima::App are described under L</Configuration>.
     method run ()
 
 Runs the application by querying the router for a match to C<PATH_INFO>
-(the URL) and dispatching it.
+(the URL in the environment hash) and dispatching it.
 
 If the controller-action call fails, Minima::App checks for the
 existence of an error route. If the app is I<not in development mode>
@@ -224,13 +224,17 @@ C<development> or if it is unset. Returns false otherwise.
 
 =head1 ATTRIBUTES
 
-The attribute below is accessible through a reader method.
+The attributes below are accessible through reader methods.
 
 =over 4
 
 =item C<config>
 
 Returns the configuration hash.
+
+=item C<env>
+
+Returns the environment hash.
 
 =back
 
