@@ -14,9 +14,11 @@ field $config   :param(configuration) :reader = {};
 field $router = Minima::Router->new;
 
 ADJUST {
-    $self->_load_routes;
-    $self->_set_version;
+    $self->_read_config;
 }
+
+method set_env      ($e) { $env = $e }
+method set_config   ($c) { $config = $c; $self->_read_config }
 
 method development
 {
@@ -76,6 +78,23 @@ method _not_found
     ]
 }
 
+method _load_class ($class)
+{
+    try {
+        my $file = $class;
+        $file =~ s|::|/|g;
+        require "$file.pm";
+    } catch ($e) {
+        croak "Could not load `$class`: $e\n";
+    }
+}
+
+method _read_config
+{
+    $self->_load_routes;
+    $self->_set_version;
+}
+
 method _load_routes
 {
     my $file = $config->{routes};
@@ -96,17 +115,6 @@ method _load_routes
         }
     }
     $router->read_file($file);
-}
-
-method _load_class ($class)
-{
-    try {
-        my $file = $class;
-        $file =~ s|::|/|g;
-        require "$file.pm";
-    } catch ($e) {
-        croak "Could not load `$class`: $e\n";
-    }
 }
 
 method _set_version
@@ -146,24 +154,38 @@ Minima::App - Application class for Minima
 
 Minima::App is the core of a Minima web application. It handles starting
 the app, connecting to the router, and dispatching route matches. For
-more details on this process, see the L<C<run>|/run> method.
+more details on this process, refer to the L<C<run>|/run> method.
 
-Two essential parts of an app are the routes file and configuration
-hash.
+Three key components of an app are the routes file, the configuration
+hash, and the environment hash.
+
+=over 4
+
+=item *
 
 The routes file describes the application's routes. Minima::App checks
-for the existence of this file and passes it to the router, which
-handles reading and processing the routes. For more on how to configure
-and specify the location of the routes file, see the
-L<C<routes>|/routes> configuration key and L<Minima::Router>.
+for its existence and passes it to the router, which handles reading and
+processing the routes. For details on configuring and specifying the
+location of the routes file, see the L<C<routes>|/routes> configuration
+key and L<Minima::Router>.
+
+=item *
 
 The configuration hash is central to many operations. This hash is
 usually loaded from a file, though it can be passed directly to the
-L<C<new>|/new> method. Tipically, this is handled by L<Minima::Setup>.
+L<C<new>|/new> method. This is usually handled by L<Minima::Setup>.
 
 A reference for the configuration keys used by Minima::App is provided
 below. Other modules may also utilize the configuration hash, so refer
 to their documentation for module-specific details.
+
+=item *
+
+Lastly, the environment hash is a reference to the PSGI environment.
+Since it's essential for route matching, it must be set before running
+the app.
+
+=back
 
 =head2 Configuration
 
@@ -197,15 +219,18 @@ C<VERSION> wasn't given explicitly.
     method new (environment = undef, configuration = {})
 
 Instantiates the app with the provided Plack environment and
-configuration hash. Both parameters are optional. Configuration keys
-used by Minima::App are described under L</Configuration>.
+configuration hash. Both parameters are optional, but the environment is
+required to run the app. If not passed during construction, make sure to
+call C<set_env> before C<run>. Configuration keys used by Minima::App
+are described under L</Configuration>.
 
 =head2 run
 
     method run ()
 
 Runs the application by querying the router for a match to C<PATH_INFO>
-(the URL in the environment hash) and dispatching it.
+(the URL in the environment hash) and dispatching it. The enviroment
+must already be set.
 
 If the controller-action call fails, Minima::App checks for the
 existence of an error route. If the app is I<not in development mode>
@@ -224,7 +249,8 @@ C<development> or if it is unset. Returns false otherwise.
 
 =head1 ATTRIBUTES
 
-The attributes below are accessible through reader methods.
+The attributes below are accessible via reader methods and can be
+set with methods of the same name prefixed by C<set_>.
 
 =over 4
 
