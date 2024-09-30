@@ -3,6 +3,8 @@ use experimental 'class';
 
 class Minima::Controller;
 
+use Data::Dumper;
+
 use Plack::Request;
 use Plack::Response;
 
@@ -60,6 +62,16 @@ method print_env
             sprintf "%*s => %s\n", -$max, $_, $env->{$_}
         } sort keys %$env
     );
+    $response->finalize;
+}
+
+method dd ($ref)
+{
+    my $dumper = Data::Dumper->new([ $ref ]);
+    $dumper->Terse(1);
+
+    $response->content_type('text/plain; charset=utf-8');
+    $response->body($dumper->Dump);
     $response->finalize;
 }
 
@@ -137,6 +149,15 @@ Methods used to emit a minimal C<hello, world> or not found response.
 =head2 print_env
 
 Returns a plain text printout of the current Plack environment.
+
+=head2 dd
+
+    method dd ($ref)
+
+Sets the response to C<text/plain>, dumps the passed reference with
+L<Data::Dumper>, and finalizes the response. Useful for debugging.
+
+    return dd($my_data);
 
 =head1 ATTRIBUTES
 
