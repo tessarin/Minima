@@ -4,11 +4,12 @@ use experimental 'class';
 class Minima::Controller;
 
 use Data::Dumper;
-
+use Encode qw(decode);
+use Hash::MultiValue;
 use Plack::Request;
 use Plack::Response;
 
-field $env      :param(environment) :reader;
+field $env             :reader;
 field $app      :param :reader;
 field $route    :param :reader = {};
 
@@ -17,6 +18,8 @@ field $response :reader;
 field $params   :reader;
 
 ADJUST {
+    $env = $app->env // {};
+
     $request  = Plack::Request->new($env);
     $response = Plack::Response->new(200);
     $response->content_type('text/plain; charset=utf-8');
@@ -86,7 +89,6 @@ Minima::Controller - Base class for controllers used with Minima
     use Minima::Controller;
 
     my $controller = Minima::Controller->new(
-        environment => $env, # Plack $env
         app => $app,         # Minima::App
         route => $match,     # a match returned by Minima::Router
     );
@@ -111,13 +113,13 @@ response as C<'text/plain; charset=utf-8'> and response code to 200.
 
 =head2 new
 
-    method new (app, environment, route = {})
+    method new (app, route = {})
 
-Instantiates a controller with the given C<$app> reference, Plack
-environment and optionally the hash reference returned by the router.
-If this hash reference contains data extracted from the URI by
-L<Minima::Router>, then this data will be made available to the
-controller through the L<C<route>|/route> field.
+Instantiates a controller with the given C<$app> reference, and
+optionally the hash reference returned by the router. If this hash
+reference contains data extracted from the URI by L<Minima::Router>,
+then this data will be made available to the controller through the
+L<C<route>|/route> field.
 
 =head2 redirect
 

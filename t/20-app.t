@@ -19,7 +19,6 @@ $class->spew(<<~'EOF'
     use v5.40;
     use experimental 'class';
     class C {
-        field $environment :param;
         field $app :param;
         field $route :param;
         method a { 'secret' }
