@@ -41,7 +41,6 @@ method run
     $self->_load_class($class);
 
     my $controller = $class->new(
-        environment => $env,
         app => $self,
         route => $m,
     );
@@ -57,7 +56,6 @@ method run
             $method = $err->{action};
             $self->_load_class($class);
             $controller = $class->new(
-                environment => $env,
                 app => $self,
                 route => $err,
             );
