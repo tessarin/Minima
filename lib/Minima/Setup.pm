@@ -7,6 +7,7 @@ use Minima::App;
 use Path::Tiny;
 
 our $config = {};
+our $app;
 
 sub import
 {
@@ -30,14 +31,16 @@ sub import
     }
     croak "Config is not a hash reference.\n"
         unless ref $config eq ref {};
+
+    # initialize app
+    $app = Minima::App->new(
+        configuration => $config,
+    );
 }
 
 sub init ($env)
 {
-    my $app = Minima::App->new(
-        environment => $env,
-        configuration => $config,
-    );
+    $app->set_env($env);
     $app->run;
 }
 
@@ -77,9 +80,15 @@ will be loaded with an empty configuration hash.
 
     sub init ($env)
 
-Receives the Plack environment and creates and runs a L<Minima::App>
-object. A reference to this subroutine can be passed as the starting
-point of the PSGI application.
+Receives the Plack environment and runs the L<Minima::App> object. A
+reference to this subroutine can be passed as the starting point of the
+PSGI application.
+
+=head1 TESTING
+
+For testing purposes, you may want to have Minima::Setup load the
+configuration and create a L<Minima::App>. You can access a reference to
+the created app (after importing the module) with C<Minima::Setup::app>.
 
 =head1 SEE ALSO
 
