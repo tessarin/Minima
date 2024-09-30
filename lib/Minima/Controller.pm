@@ -17,6 +17,8 @@ field $request  :reader;
 field $response :reader;
 field $params   :reader;
 
+field $req_encoding;
+
 ADJUST {
     $env = $app->env // {};
 
@@ -24,7 +26,7 @@ ADJUST {
     $response = Plack::Response->new(200);
     $response->content_type('text/plain; charset=utf-8');
 
-    $params = $request->parameters;
+    $params = $self->_get_request_parameters;
 }
 
 method hello
@@ -78,6 +80,42 @@ method dd ($ref)
     $response->finalize;
 }
 
+method _get_request_parameters
+{
+    $req_encoding = $app->config->{request_encoding} // 'UTF-8';
+
+    my @parameters = map {
+        $self->_decode($_)
+    } $request->parameters->flatten;
+
+    $params = Hash::MultiValue->new(@parameters);
+}
+
+method _decode ($data)
+{
+    if (ref $data eq ref {}) {
+        my %encoded;
+        for my ($k, $v) (%$data) {
+            $encoded{ $self->_decode($k) } = $self->_decode($v);
+        }
+        return \%encoded;
+    }
+
+    if (ref $data eq ref []) {
+        my @encoded;
+        for my $v (@$data) {
+            push @encoded, $self->_decode($v);
+        }
+        return \@encoded;
+    }
+
+    if (defined $data) {
+        return decode($req_encoding, $data);
+    }
+
+    undef;
+}
+
 __END__
 
 =head1 NAME
@@ -108,6 +146,15 @@ making it readily available to controllers.
 This base class is not connected to any view, which is left to methods
 or subclasses. However, it sets a default C<Content-Type> header for the
 response as C<'text/plain; charset=utf-8'> and response code to 200.
+
+=head1 CONFIGURATION
+
+The C<request_encoding> key can be included in the main L<Minima::App>
+configuration hash to specify the expected request encoding. The I<GET>
+and I<POST> parameters will be decoded based on this setting.
+
+If not set, C<request_encoding> defaults to C<UTF-8>. You may use any
+encoding value supported by L<Encode>.
 
 =head1 METHODS
 
@@ -189,7 +236,8 @@ Internal L<Plack::Response>
 
 =item C<params>
 
-A shortcut for C<$request-E<gt>parameters>.
+Decoded GET and POST parameters merged in a L<Hash::MultiValue>. See
+L<"Configuration"|/CONFIGURATION> to set the desired encoding.
 
 =back
 
