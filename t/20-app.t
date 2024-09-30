@@ -72,9 +72,7 @@ my $env = { PATH_INFO => '/' };
     );
 
     # respects a manually set version
-    $app = Minima::App->new(
-        configuration => { VERSION => 'SecretVersion' }
-    );
+    $app->set_config({ VERSION => 'SecretVersion' });
 
     is(
         $app->config->{VERSION},
@@ -91,9 +89,7 @@ my $env = { PATH_INFO => '/' };
         EOF
     );
     local @INC = ( $dir->absolute, @INC );
-    $app = Minima::App->new(
-        configuration => { version_from => 'V' }
-    );
+    $app->set_config({ version_from => 'V' });
 
     is(
         $app->config->{VERSION},
@@ -104,9 +100,7 @@ my $env = { PATH_INFO => '/' };
     # dies for bad class passed
     like(
         dies {
-            $app = Minima::App->new(
-                configuration => { version_from => 'W' }
-            )
+            $app->set_config({ version_from => 'W' })
         },
         qr/failed.*version/i,
         'dies for unreadable class to extract version'
@@ -120,9 +114,7 @@ my $env = { PATH_INFO => '/' };
         class X { }
         EOF
     );
-    $app = Minima::App->new(
-        configuration => { version_from => 'X' }
-    );
+    $app->set_config({ version_from => 'X' });
 
     is(
         $app->config->{VERSION},
@@ -158,9 +150,7 @@ my $env = { PATH_INFO => '/' };
         'routes root without a routes file'
     );
 
-    $app = Minima::App->new(
-        environment => { PATH_INFO => '/ThisURIDoesNotExist' }
-    );
+    $app->set_env({ PATH_INFO => '/ThisURIDoesNotExist' });
     $response = $app->run;
     ok(
         ( ref $response eq ref [] and $response->[0] == 404 ),
@@ -209,6 +199,7 @@ my $env = { PATH_INFO => '/' };
 {
     local @INC = ( $dir->absolute, @INC );
     local %ENV = %ENV;
+    my $r_env = { PATH_INFO => '/' };
     my $app;
 
     my $routes = $dir->child('etc/routes.map');
@@ -221,20 +212,20 @@ my $env = { PATH_INFO => '/' };
 
     # Normal
     $app = Minima::App->new(
-        environment => $env
+        environment => $r_env
     );
     my $response = $app->run;
     is( $response, 'secret', 'routes properly' )
         or note('Response dump: ' . Dumper($response));
 
     # Not found
-    $env->{PATH_INFO} = '/c';
+    $r_env->{PATH_INFO} = '/c';
     $response = $app->run;
     is( ref $response, ref [], 'not found returned proper response' );
     is( $response->[0], 404, 'handles not found' );
 
     # Force an error page
-    $env->{PATH_INFO} = '/d';
+    $r_env->{PATH_INFO} = '/d';
     $ENV{PLACK_ENV} = 'deployment';
     is( $app->run, 'error', 'handles error properly' );
     $ENV{PLACK_ENV} = 'development';
