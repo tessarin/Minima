@@ -14,6 +14,7 @@ is( $res->content, "hello, world\n", 'hello, world\n' );
 # Move to the complex example in eg/
 {
     chdir 'eg';
+    $Minima::Setup::app->_read_config; # refresh config in new dir
 
     local @INC = ( 'lib', @INC );
     local %ENV = %ENV;
@@ -23,7 +24,7 @@ is( $res->content, "hello, world\n", 'hello, world\n' );
     like( $res->content, qr/<html>/, 'outputs html' );
 
     $res = $test->request(GET '/ThisURIDoesNotExist');
-    is( $res->code, 404, 'handler not found' );
+    is( $res->code, 404, 'handles not found' );
 }
 
 done_testing;
