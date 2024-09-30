@@ -7,6 +7,7 @@ use Carp;
 use Path::Tiny;
 use Template;
 use Template::Constants qw/ :debug /;
+use utf8;
 
 field $app                  :param;
 field $directory            = 'templates';
@@ -106,6 +107,7 @@ method render ($data = {})
         INCLUDE_PATH => [ $directory, @{ $settings{include_extra} } ],
         OUTLINE_TAG => '%%',
         ANYCASE => 1,
+        ENCODING => 'utf8',
     );
     if ($app->development) {
         $tt_default{DEBUG} = DEBUG_UNDEF;
@@ -123,6 +125,7 @@ method render ($data = {})
               $tt->error, "\n" unless $r;
     }
 
+    utf8::encode($body);
     $body;
 }
 
@@ -168,6 +171,9 @@ default F<templates> directory) and selecting the template to be used
 (with L<C<set_template>>), the view collects and formats data to pass to
 the template. This final stage ultimately determines how the output is
 structured.
+
+B<Note:> Minima::View::HTML works with UTF-8 by default, and encodes the
+body response.
 
 =head1 DATA
 
