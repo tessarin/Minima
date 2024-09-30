@@ -256,13 +256,13 @@ set with methods of the same name prefixed by C<set_>.
 
 =over 4
 
-=item C<config>
+=item C<config>, C<set_config>
 
-Returns the configuration hash.
+Returns or sets the configuration hash.
 
-=item C<env>
+=item C<env>, C<set_env>
 
-Returns the environment hash.
+Returns or sets the environment hash.
 
 =back
 
