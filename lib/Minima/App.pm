@@ -97,6 +97,8 @@ method _read_config
 
 method _load_routes
 {
+    $router->clear_routes;
+
     my $file = $config->{routes};
     unless (defined $file) {
         # No file passed. Attempt the default route.

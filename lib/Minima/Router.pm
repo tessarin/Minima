@@ -58,6 +58,11 @@ method error_route
     $special{server_error}
 }
 
+method clear_routes
+{
+    $router = Router::Simple->new;
+}
+
 __END__
 
 =head1 NAME
@@ -226,6 +231,12 @@ that in order to perform the intended action.
 Returns the controller-action pair registered with the
 L<C<server_error>|/server_error> directive. If nothing was registered,
 returns C<undef>.
+
+=head2 clear_routes
+
+    method clear_routes ()
+
+Removes all registered routes.
 
 =head1 SEE ALSO
 
