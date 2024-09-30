@@ -229,18 +229,12 @@ my $env = { PATH_INFO => '/' };
 
     # Not found
     $env->{PATH_INFO} = '/c';
-    $app = Minima::App->new(
-        environment => $env
-    );
     $response = $app->run;
     is( ref $response, ref [], 'not found returned proper response' );
     is( $response->[0], 404, 'handles not found' );
 
     # Force an error page
     $env->{PATH_INFO} = '/d';
-    $app = Minima::App->new(
-        environment => $env
-    );
     $ENV{PLACK_ENV} = 'deployment';
     is( $app->run, 'error', 'handles error properly' );
     $ENV{PLACK_ENV} = 'development';
