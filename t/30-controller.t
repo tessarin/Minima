@@ -1,10 +1,13 @@
 use v5.40;
 use Test2::V0;
 
+use Minima::App;
 use Minima::Controller;
 
+my $app = Minima::App->new;
 my $c = Minima::Controller->new(
-    map { $_ => +{} } qw/ environment app route /
+    app => $app,
+    route => { },
 );
 
 my $response = $c->hello;
