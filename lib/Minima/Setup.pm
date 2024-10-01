@@ -5,6 +5,7 @@ package Minima::Setup;
 use Carp;
 use Minima::App;
 use Path::Tiny;
+use Plack::Test;
 
 our $config = {};
 our $app;
@@ -42,6 +43,11 @@ sub init ($env)
 {
     $app->set_env($env);
     $app->run;
+}
+
+sub test
+{
+    Plack::Test->create(\&init);
 }
 
 __END__
@@ -83,6 +89,12 @@ will be loaded with an empty configuration hash.
 Receives the Plack environment and runs the L<Minima::App> object. A
 reference to this subroutine can be passed as the starting point of the
 PSGI application.
+
+=head2 test
+
+    sub test ()
+
+Creates and returns L<Plack::Test> object with the current Minima::App.
 
 =head1 TESTING
 
