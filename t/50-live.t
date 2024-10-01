@@ -1,12 +1,10 @@
 use v5.40;
 use Test2::V0;
-use Plack::Test;
 use HTTP::Request::Common;
 
 use Minima::Setup;
 
-my $app = \&Minima::Setup::init;
-my $test = Plack::Test->create($app);
+my $test = Minima::Setup::test;
 
 my $res = $test->request(GET '/');
 is( $res->content, "hello, world\n", 'hello, world\n' );
