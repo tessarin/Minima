@@ -95,6 +95,7 @@ PSGI application.
     sub test ()
 
 Creates and returns L<Plack::Test> object with the current Minima::App.
+See L<Minima::Manual::Testing> for more on testing.
 
 =head1 TESTING
 
