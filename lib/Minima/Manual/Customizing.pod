@@ -29,9 +29,8 @@ subclass and implement your logic as desired.
 
 If you don't want to subclass it and are relying on L<Minima::App> to
 instantiate and call your controller, you should note that by default it
-will pass three named arguments to your controller's C<new> method:
+will pass two named arguments to your controller's C<new> method:
 
-    environment => $env,
     app => $self,
     route => $m,
 
