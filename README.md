@@ -37,7 +37,7 @@ Templates:
 
 Install with [cpanm][cpm]:
 
-    $ cpanm git://github.com/tessarin/Minima.git
+    $ cpanm Minima
 
 ## Documentation
 
