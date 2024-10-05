@@ -257,6 +257,7 @@ By default, the following configuration is used:
     {
         OUTLINE_TAG => '%%',
         ANYCASE => 1,
+        ENCODING => 'utf8',
     }
 
 These can be overwritten. Additionally, if the app is in development
