@@ -113,7 +113,7 @@ projects. See L<minima> for full details.
 One of its main features is creating a project from scratch, using
 templates with the recommended structure.
 
-    $ minima new app/
+    $ minima new app
 
 =head1 HISTORY
 
