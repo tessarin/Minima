@@ -131,7 +131,7 @@ method render ($data = {})
 
 sub _ext ($file)
 {
-    $file = "$file.tt" unless $file =~ /\.\w+$/;
+    $file = "$file.ht" unless $file =~ /\.\w+$/;
 }
 
 __END__
@@ -313,7 +313,7 @@ called, the default F<templates> directory will be used.
 
     method set_template ($title)
 
-Sets the template name to be used. If no extension is present, F<.tt>
+Sets the template name to be used. If no extension is present, F<.ht>
 will be added. A dot (C<.>) must not be present in the template name.
 
 =head2 add_include_path
