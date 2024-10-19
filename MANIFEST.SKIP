@@ -9,3 +9,4 @@
 \.sw[op]$
 ^MYMETA\.yml$
 ^MYMETA\.json$
+^cover_db
