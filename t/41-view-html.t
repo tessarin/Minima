@@ -15,6 +15,8 @@ my $dir = Path::Tiny->tempdir;
 chdir $dir;
 my $t_home = $dir->child('home.ht');
 $t_home->spew('h');
+my $t_about = $dir->child('about.tt');
+$t_about->spew('t');
 
 # Basic template check
 like(
@@ -35,7 +37,13 @@ $view->set_template('home');
 is( $view->render, 'h', 'renders properly' );
 pass( 'automatically adds .ht extension' );
 
+$config->{template_ext} = 'tt';
+$view->set_template('about');
+is( $view->render, 't', 'adds custom template extension' );
+delete $config->{template_ext};
+
 # Data
+$view->set_template('home');
 $t_home->spew('[% d %]');
 is( $view->render({ d => 'secret' }), 'secret', 'passes data' );
 
