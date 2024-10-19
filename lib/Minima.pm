@@ -1,5 +1,5 @@
 use v5.40;
-package Minima v0.1.1;
+package Minima v0.2.0;
 1;
 
 __END__
