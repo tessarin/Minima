@@ -5,7 +5,7 @@ use Getopt::Long qw/ :config bundling pass_through /;
 use Pod::Usage;
 
 use IO::Socket::INET;
-use Minima::App;
+use Minima;
 use Minima::Project;
 
 my $help;
@@ -21,7 +21,7 @@ Getopt::Long::Configure('no_pass_through');
 
 # Preliminary
 pod2usage(-exitval => 0, -verbose => 2) if $help;
-say 'Minima v', $Minima::App::VERSION and exit if $version;
+say 'Minima ', Minima->VERSION and exit if $version;
 
 # Commands
 $command = shift @ARGV // 'nop';
