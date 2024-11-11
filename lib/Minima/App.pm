@@ -5,6 +5,7 @@ class Minima::App;
 
 use Carp;
 use Minima::Router;
+use Plack::Util;
 
 use constant DEFAULT_VERSION => 'prototype';
 
@@ -45,8 +46,10 @@ method run
         route => $m,
     );
 
+    my $response;
+
     try {
-        $controller->$method;
+        $response = $controller->$method;
     } catch ($e) {
         my $err = $router->error_route;
         # Something failed. If we're in production
@@ -59,12 +62,30 @@ method run
                 app => $self,
                 route => $err,
             );
-            $controller->$method($e);
+            $response = $controller->$method($e);
         } else {
             # Nothing can be done, re-throw
             die $e;
         }
     }
+
+    # Delete body on HEAD requests
+    my $auto_head = $config->{automatic_head} // 1;
+    if (   $auto_head
+        && length $env->{REQUEST_METHOD}
+        && $env->{REQUEST_METHOD} eq 'HEAD'
+    ) {
+        return Plack::Util::response_cb($response, sub {
+            my $res = shift;
+            if ($res->[2]) {
+                $res->[2] = [];
+            } else {
+                return sub { defined $_[0] ? '' : undef };
+            }
+        });
+    }
+
+    return $response;
 }
 
 method _not_found
@@ -190,6 +211,12 @@ the app.
 =head2 Configuration
 
 =over 4
+
+=item C<automatic_head>
+
+Automatically remove the response body for HEAD requests. Defaults to
+true. See also: L<"Routes File in Minima::Router"|Minima::Router/"ROUTES
+FILE">.
 
 =item C<routes>
 
