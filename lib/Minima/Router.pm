@@ -60,7 +60,8 @@ method error_route
 
 method clear_routes
 {
-    $router = Router::Simple->new;
+    $router  = Router::Simple->new;
+    %special = ( );
 }
 
 __END__
