@@ -1,3 +1,16 @@
+v0.3.0  2024-11-11
+
+        [Changes]
+        - Minima::Router now supports matching HEAD requests to GET
+          routes.
+        - Minima::App can automatically remove the response body for
+          HEAD requests.
+        - Add support to a default data hash in Minima::View::HTML.
+
+        [Fixes]
+        - Version option not working in bin/minima.
+        - Minima::Router's clear_routes would not remove special routes.
+
 v0.2.0  2024-10-18
 
         [Changes]
