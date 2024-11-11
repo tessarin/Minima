@@ -37,7 +37,7 @@ $routes->spew(<<~EOF
     @ server_error C E
     EOF
 );
-$r = Minima::Router->new;
+$r->clear_routes;
 $r->read_file($routes);
 my $error_r = $r->error_route;
 is( $error_r->{controller}, 'C', 'returns correct error controller' );
@@ -55,5 +55,45 @@ $r->read_file($routes);
 $match = $r->match('/');
 is( $match->{controller}, 'C', 'returns correct controller match' );
 is( $match->{action}, 'H', 'returns correct action match' );
+
+# HEAD vs. GET
+{
+    $routes->spew(<<~EOF
+        GET  both C b
+        _GET get  C g
+        EOF
+    );
+    $r->clear_routes;
+    $r->read_file($routes);
+    my $env = {
+        PATH_INFO      => 'both',
+        REQUEST_METHOD => 'GET',
+    };
+
+    # GET on GET
+    my $match = $r->match($env);
+    is( $match->{action}, 'b', 'matches on universal GET' );
+
+    # HEAD on GET
+    $env->{REQUEST_METHOD} = 'HEAD';
+    $match = $r->match($env);
+    is( $match->{action}, 'b', 'matches HEAD on universal GET' );
+
+    # PUT on GET
+    $env->{REQUEST_METHOD} = 'PUT';
+    $match = $r->match($env);
+    is( $match, undef, 'respects method constraint' );
+
+    # GET on GET_
+    $env->{PATH_INFO} = 'get';
+    $env->{REQUEST_METHOD} = 'GET';
+    $match = $r->match($env);
+    is( $match->{action}, 'g', 'matches GET on exclusive GET' );
+
+    # HEAD on GET
+    $env->{REQUEST_METHOD} = 'HEAD';
+    $match = $r->match($env);
+    is( $match, undef, 'does not match HEAD on exclusive GET' );
+}
 
 done_testing;
