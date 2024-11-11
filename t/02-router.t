@@ -4,10 +4,11 @@ use Path::Tiny;
 
 use Minima::Router;
 
+# Main globals
 my $r = Minima::Router->new;
 my $routes = Path::Tiny->tempfile;
 
-# Works without doing nothing
+# Works without doing anything
 is( $r->match('/'), undef, 'works out of the box' );
 
 # Non-existing routes file
@@ -40,7 +41,7 @@ $r = Minima::Router->new;
 $r->read_file($routes);
 my $error_r = $r->error_route;
 is( $error_r->{controller}, 'C', 'returns correct error controller' );
-is( $error_r->{action}, 'E', 'returnscorrect error action' );
+is( $error_r->{action}, 'E', 'returns correct error action' );
 
 my $match = $r->match('/');
 is( $match->{controller}, 'C', 'returns correct not found controller' );
