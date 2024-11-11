@@ -12,6 +12,7 @@ use utf8;
 field $app                  :param;
 field $directory            = 'templates';
 field $template;
+field $default_data         = {};
 
 field %settings = (
     block_indexing => 1,    # block robots with a <meta>
@@ -72,6 +73,8 @@ method add_include_path ($d)
 method set_block_indexing ($n = 1) { $settings{block_indexing} = $n }
 method set_name_as_class  ($n = 1) { $settings{name_as_class} = $n }
 
+method set_default_data   ($d) { $default_data = $d }
+
 method add_header_script  ($s) { push @{$content{header_scripts}}, $s }
 method add_header_css     ($c) { push @{$content{header_css}}, $c }
 method add_pre            ($p) { push @{$content{pre}}, $self->_ext($p) }
@@ -83,6 +86,9 @@ method add_class          ($c) { push @{$content{classes}}, $c }
 method render ($data = {})
 {
     croak "No template set." unless $template;
+
+    # Merge default data
+    $data = { %$default_data, %$data };
 
     # Build vars to send to template
     my %vars = ( %content, settings => \%settings );
@@ -248,6 +254,17 @@ A color to be set on the C<E<lt>meta name="theme-color"E<gt>> tag.
 
 =back
 
+=head2 Default Data
+
+A default data hash can be set using
+L<C<set_default_data>|/set_default_data>. This hash serves as a base for
+data passed to L<C<render>|/render>, allowing the data in C<render> to
+overwrite default values as needed.
+
+This is particularly useful for data available at the time of view
+initialization, which does not depend on the specific controller that
+ultimately renders the view.
+
 =head1 CONFIGURATION
 
 =head2 tt
@@ -288,8 +305,9 @@ Constructs a new object. Requires a L<Minima::App> reference.
 Renders the template with the passed data made available to it, as well
 as the standard data (described in L<"Data"|/DATA>) and returns it.
 
-To configure L<Template Toolkit|Template>, see the
-L<"Configuration"/CONFIGURATION> section.
+To configure L<Template Toolkit|Template>, visit the
+L<"Configuration"/CONFIGURATION> section. See also
+L<C<set_default_data>|/set_default_data>.
 
 =head2 set_title
 
@@ -326,6 +344,13 @@ Sets the template name to be used. If no extension is present, the
 extension set by the L<C<template_ext>|/template_ext> configuration key
 (F<ht> by default) will be added. The template file name must not
 contain a dot (C<.>), except for the one used in the extension.
+
+=head2 set_default_data
+
+    method set_default_data ($data)
+
+Sets a default data hash that will be used in rendering pages. The hash
+provided in L<C<render>|/render> is merged with this default data hash.
 
 =head2 add_include_path
 
