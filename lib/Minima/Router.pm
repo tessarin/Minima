@@ -35,7 +35,15 @@ method read_file ($file)
         # Build destination and options
         my %dest = ( controller => $controller, action => $action );
         my %opt;
-        $opt{method} = $method unless $method eq '*';
+        if ($method eq '*') {
+            # Do nothing -- don't add a constraint
+        } elsif ($method eq 'GET') {
+            $opt{method} = [ qw/ GET HEAD / ];
+        } elsif ($method eq '_GET') {
+            $opt{method} = 'GET';
+        } else {
+            $opt{method} = $method;
+        }
 
         # Test the nature of the route
         if ($method eq '@') {
@@ -132,6 +140,9 @@ The name of the HTTP method to which this route applies (GET, POST,
 etc.). This value may also be set to C<*>, in which case any method is
 permitted for this route. If set to C<@>, the route represents a special
 directive determined in conjunction with the next column.
+
+B<Note>: C<GET> matches both GET and HEAD requests. To match GET
+exclusively, use C<_GET> instead.
 
 =item B<Route Name>
 
