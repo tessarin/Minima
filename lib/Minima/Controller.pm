@@ -48,9 +48,11 @@ method redirect ($url, $code = 302)
     $response->finalize;
 }
 
-method render ($v, $data = {})
+method render ($view, $data = {})
 {
-    $response->body($v->render($data));
+    $response->body($view->render($data));
+    $view->prepare_response($response);
+
     $response->finalize;
 }
 
@@ -62,6 +64,7 @@ method print_env
     for (map { length } keys %$env) {
         $max = $_ if $_ > $max;
     }
+
     $response->body(
         map {
             sprintf "%*s => %s\n", -$max, $_, $env->{$_}
@@ -186,8 +189,9 @@ Use with C<return> inside other controller methods to shortcut:
     method render ($view, $data = {})
 
 Utility method to call C<render> on the passed view, together with
-optional data, and save to the response body. Afterward, it returns the
-finalized response.
+optional data, and save to the response body. It then calls
+C<prepare_response> on the passed view and returns the finalized
+response.
 
 =head1 EXTRAS
 
