@@ -8,6 +8,7 @@ use Minima::Project;
 use Minima::Router;
 use Minima::Setup;
 use Minima::View::HTML;
+use Minima::View::JSON;
 use Minima::View;
 
 pass 'modules loaded';
