@@ -153,7 +153,7 @@ Minima::View::HTML - Render HTML views
 
     use Minima::View::HTML;
 
-    my $view = Minima::HTML::View->new(app => $app);
+    my $view = Minima::View::HTML->new(app => $app);
 
     $view->set_directory('templates'); # where templates resite
     $view->set_template('home');
@@ -420,7 +420,7 @@ Adds the passed class name to the list of C<E<lt>mainE<gt>> classes.
 
 =head1 SEE ALSO
 
-L<Minima>, L<Minima::Controller>, L<perlclass>.
+L<Minima>, L<Minima::Controller>, L<Minima::View>, L<perlclass>.
 
 =head1 AUTHOR
 
