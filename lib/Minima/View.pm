@@ -26,7 +26,8 @@ It currently implements a single method: C<render>, which should not be
 called on this base class. (Perhaps, with roles in Perl core in the
 future, this class might become unnecessary.)
 
-For HTML views, see L<Minima::View::HTML>.
+For HTML views, see L<Minima::View::HTML>. For JSON, see
+L<Minima::View::JSON>.
 
 =head1 METHODS
 
