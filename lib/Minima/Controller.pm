@@ -6,6 +6,7 @@ class Minima::Controller;
 use Data::Dumper;
 use Encode qw(decode);
 use Hash::MultiValue;
+use Minima::View::PlainText;
 use Plack::Request;
 use Plack::Response;
 
@@ -24,22 +25,19 @@ ADJUST {
 
     $request  = Plack::Request->new($env);
     $response = Plack::Response->new(200);
-    $response->content_type('text/plain; charset=utf-8');
 
     $params = $self->_get_request_parameters;
 }
 
 method hello
 {
-    $response->body("hello, world\n");
-    $response->finalize;
+    $self->render(Minima::View::PlainText->new, "hello, world\n");
 }
 
 method not_found
 {
     $response->code(404);
-    $response->body("not found\n");
-    $response->finalize;
+    $self->render(Minima::View::PlainText->new, "not found\n");
 }
 
 method redirect ($url, $code = 302)
@@ -65,12 +63,12 @@ method print_env
         $max = $_ if $_ > $max;
     }
 
-    $response->body(
+    $self->render(
+        Minima::View::PlainText->new,
         map {
             sprintf "%*s => %s\n", -$max, $_, $env->{$_}
         } sort keys %$env
     );
-    $response->finalize;
 }
 
 method dd ($ref)
@@ -78,9 +76,10 @@ method dd ($ref)
     my $dumper = Data::Dumper->new([ $ref ]);
     $dumper->Terse(1);
 
-    $response->content_type('text/plain; charset=utf-8');
-    $response->body($dumper->Dump);
-    $response->finalize;
+    $self->render(
+        Minima::View::PlainText->new,
+        $dumper->Dump,
+    );
 }
 
 method _get_request_parameters
