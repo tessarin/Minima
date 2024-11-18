@@ -7,6 +7,11 @@ use JSON;
 
 field $app :param;
 
+method prepare_response ($response)
+{
+    $response->content_type('application/json');
+}
+
 method render ($data = {})
 {
     $app->development
@@ -45,6 +50,13 @@ B<Note:> Minima::View::JSON encodes data as UTF-8.
 
 Creates a new instance of the class. Expects a L<Minima::App> reference
 as the C<app> parameter.
+
+=head2 prepare_response
+
+    method prepare_response ($response)
+
+Sets the appropriate I<Content-Type> header on the provided
+L<Plack::Response> object.
 
 =head2 render
 

@@ -83,6 +83,11 @@ method add_pre_body       ($p) { push @{$content{pre_body}}, $p }
 method add_script         ($s) { push @{$content{scripts}}, $s }
 method add_class          ($c) { push @{$content{classes}}, $c }
 
+method prepare_response ($response)
+{
+    $response->content_type('text/html; charset=utf-8');
+}
+
 method render ($data = {})
 {
     croak "No template set." unless $template;
@@ -297,6 +302,13 @@ automatically to template file names if none is provided.
     method new (app)
 
 Constructs a new object. Requires a L<Minima::App> reference.
+
+=head2 prepare_response
+
+    method prepare_response ($response)
+
+Sets the appropriate I<Content-Type> header on the provided
+L<Plack::Response> object.
 
 =head2 render
 
