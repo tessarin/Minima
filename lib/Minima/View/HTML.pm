@@ -1,7 +1,7 @@
 use v5.40;
 use experimental 'class';
 
-class Minima::View::HTML;
+class Minima::View::HTML :isa(Minima::View);
 
 use Carp;
 use Path::Tiny;
