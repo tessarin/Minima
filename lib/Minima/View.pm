@@ -33,6 +33,26 @@ L<C<prepare_response>|/prepare_response>, which should not be called on
 this base class. (Perhaps, with roles in Perl core in the future, this
 class might become unnecessary.)
 
+=head2 Subclasses
+
+These views are built into Minima by default:
+
+=over 4
+
+=item L<Minima::View::HTML>
+
+For rendering HTML content, includes utility methods.
+
+=item L<Minima::View::JSON>
+
+For creating JSON responses.
+
+=item L<Minima::View::PlainText>
+
+For plain text output.
+
+=back
+
 For HTML views, see L<Minima::View::HTML>. For JSON, see
 L<Minima::View::JSON>.
 
