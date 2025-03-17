@@ -135,6 +135,12 @@ method _load_routes
             return;
         }
     }
+
+    # Controller prefix
+    my $prefix = $config->{controller_prefix};
+    $router->set_prefix($prefix) if defined $prefix;
+
+    # Read routes
     $router->read_file($file);
 }
 
@@ -217,6 +223,12 @@ the app.
 Automatically remove the response body for HEAD requests. Defaults to
 true. See also: L<"Routes File" in Minima::Router|Minima::Router/"ROUTES
 FILE">.
+
+=item C<controller_prefix>
+
+The default prefix prepended to controller names in the routes file when
+using the C<:> shortcut. See also: L<"Controller" in
+Minima::Router|Minima::Router/Controller>.
 
 =item C<routes>
 
