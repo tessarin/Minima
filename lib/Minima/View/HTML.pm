@@ -146,6 +146,7 @@ method _ext ($file)
 {
     my $ext = $app->config->{template_ext} // 'ht';
     $file = "$file.$ext" unless $file =~ /\.\w+$/;
+    $file;
 }
 
 __END__

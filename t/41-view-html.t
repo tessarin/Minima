@@ -18,6 +18,8 @@ my $t_home = $dir->child('home.ht');
 $t_home->spew('h');
 my $t_about = $dir->child('about.tt');
 $t_about->spew('t');
+my $t_contact = $dir->child('contact.tpl');
+$t_contact->spew('c');
 
 # Basic template check
 like(
@@ -42,6 +44,9 @@ $config->{template_ext} = 'tt';
 $view->set_template('about');
 is( $view->render, 't', 'adds custom template extension' );
 delete $config->{template_ext};
+
+$view->set_template('contact.tpl');
+is( $view->render, 'c', 'respects named file extension' );
 
 # Data
 $view->set_template('home');
