@@ -497,15 +497,16 @@ contain a dot (C<.>), except for the one used in the extension.
 
     method set_title ($title, $description = undef)
 
-Sets the L<C</title> and L<C</description>> (optional). The title may
-also be set with L<C<default_title>|/default_title>. See also
+Sets the L<C<title>|/title> and L<C<description>|/description>
+(optional). The title may also be set with
+L<C<default_title>|/default_title>. See also
 L<C<set_compound_title>|/set_compound_title>.
 
 =head2 set_theme_color
 
     method set_theme_color ($color)
 
-Sets the L<C</theme_color>.
+Sets the L<C<theme_color>|/theme_color>.
 
 =head1 SEE ALSO
 
