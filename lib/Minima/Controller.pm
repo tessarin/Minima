@@ -164,7 +164,18 @@ Minima::Controller - Base class for controllers used with Minima
         app => $app,         # Minima::App
         route => $match,     # a match returned by Minima::Router
     );
-    $controller->hello;
+
+    # Access route parameters (from URI captures)
+    my $post_id = $controller->route->{post};
+
+    # Access request parameters (query string or POST)
+    my $q = $controller->params->get('q');
+
+    # Render a response
+    $controller->render(
+        Minima::View::PlainText->new,
+        "Post: $post_id, search: $q\n"
+    );
 
 =head1 DESCRIPTION
 
@@ -318,7 +329,24 @@ Reference to a L<Minima::App>.
 
 =item C<route>
 
-Hash reference returned by the router.
+The C<route> attribute contains the hash reference returned by
+L<Minima::Router>. In addition to C<controller> and C<action>, it may
+include named captures extracted from the URI pattern.
+
+For example, given this route:
+
+    GET  /blog/{post}   :Main    show_post
+
+The action method can access the captured parameter directly:
+
+    method show_post
+    {
+        my $id = $self->route->{post};
+        ...
+    }
+
+These route parameters are separate from L<C<params>|/params>, which
+holds decoded query string and POST parameters.
 
 =item C<request>
 
