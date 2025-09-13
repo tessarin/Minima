@@ -197,6 +197,9 @@ match hash.
 
 =back
 
+For editing support in Vim, see
+L<vim-minima|https://github.com/tessarin/vim-minima>.
+
 =head2 Example
 
     # Main Routes
@@ -267,7 +270,7 @@ notation. Defaults to C<Controller>. See L</Controller> for details.
 =head1 SEE ALSO
 
 L<Minima>, L<Minima::Controller>, L<Router::Simple>, L<Plack>,
-L<perlclass>.
+L<perlclass>, L<vim-minima|https://github.com/tessarin/vim-minima>.
 
 =head1 AUTHOR
 
