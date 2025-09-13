@@ -9,6 +9,7 @@ use Hash::MultiValue;
 use Minima::View::PlainText;
 use Plack::Request;
 use Plack::Response;
+use Scalar::Util qw(reftype);
 
 field $env             :reader;
 field $app      :param :reader;
@@ -31,6 +32,34 @@ ADJUST {
 
 method before_action    ($m) { }
 method after_action     ($r) { }
+
+method trimmed_params ($options = {})
+{
+    my $exclude = $options->{exclude} // [];
+    my @params;
+
+    for my ($k, $v) ($params->flatten) {
+        if (defined $v) {
+            my $skip = 0;
+            for my $pat (@$exclude) {
+                if (ref $pat && reftype $pat eq 'REGEXP') {
+                    if (defined $k && $k =~ $pat) { $skip = 1; last }
+                } else {
+                    if (defined $k && $k eq $pat) { $skip = 1; last }
+                }
+            }
+            if (!$skip) {
+                if (!ref $v) {
+                    $v = trim $v;
+                } elsif (ref $v eq ref []) {
+                    $v = [ map { defined $_ ? trim($_) : $_ } @$v ];
+                }
+            }
+        }
+        push @params, $k, $v;
+    }
+    return Hash::MultiValue->new(@params);
+}
 
 method hello
 {
@@ -230,6 +259,30 @@ optional data, and save to the response body. It then calls
 C<prepare_response> on the passed view and returns the finalized
 response.
 
+=head2 trimmed_params
+
+    method trimmed_params ($options = {})
+
+Returns a new L<Hash::MultiValue> with decoded request parameters where
+leading and trailing whitespace in values has been removed. Keys are
+left unchanged. The original L<C<params>|/params> are not modified.
+Array values are also trimmed element-wise.
+
+Options:
+
+=over 4
+
+=item C<exclude>
+
+Array reference of parameter names (strings) or regular expressions to
+exclude from trimming. For example:
+
+    my $params = $self->trimmed_params(
+            { exclude => [ 'password', qr/^raw_/ ] }
+        );
+
+=back
+
 =head1 EXTRAS
 
 =head2 hello, not_found
@@ -279,6 +332,11 @@ Internal L<Plack::Response>
 
 Decoded GET and POST parameters merged in a L<Hash::MultiValue>. See
 L<"Configuration"|/CONFIGURATION> to set the desired encoding.
+
+Trimming whitespace is not performed automatically. If you need trimmed
+parameters, call L<C<trimmed_params>|/trimmed_params>, which returns a
+new L<Hash::MultiValue> with leading and trailing whitespace removed
+from values (keys are untouched).
 
 =back
 
