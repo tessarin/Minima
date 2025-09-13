@@ -29,6 +29,9 @@ ADJUST {
     $params = $self->_get_request_parameters;
 }
 
+method before_action    ($m) { }
+method after_action     ($r) { }
+
 method hello
 {
     $self->render(Minima::View::PlainText->new, "hello, world\n");
@@ -145,6 +148,12 @@ Minima::Controller also keeps references to the L<Minima::App> and Plack
 environment. Additionally, it retains data received from the router,
 making it readily available to controllers.
 
+Controllers may also define optional lifecycle hooks: C<before_action>
+(to run checks before an action is executed) and C<after_action> (to run
+logic after an action has completed). For details on how these hooks are
+invoked during dispatch, see L<the C<run> method in
+Minima::App|Minima::App/run>.
+
 This base class is not connected to any view, which is left to methods
 or subclasses. However, it sets a default C<Content-Type> header for the
 response as C<'text/plain; charset=utf-8'> and response code to 200.
@@ -169,6 +178,35 @@ optionally the hash reference returned by the router. If this hash
 reference contains data extracted from the URI by L<Minima::Router>,
 then this data will be made available to the controller through the
 L<C<route>|/route> field.
+
+=head2 before_action
+
+    method before_action ($method)
+
+Optional hook that runs before the action method is invoked. It receives
+the name of the action that is about to be executed.
+
+If it returns a response, that response is immediately returned to the
+client and the action itself will not run. If it returns nothing, the
+normal action flow continues.
+
+This is typically used for authentication, access control, or other
+pre-conditions.
+
+See also: L<Minima::App/run>.
+
+=head2 after_action
+
+    method after_action ($response)
+
+Optional hook that runs after the action has completed. It receives the
+response object returned by the action.
+
+The return value of C<after_action> is ignored; any changes must be made
+directly to the response object. This is typically used for logging,
+instrumentation, or post-processing.
+
+See also: L<Minima::App/run>.
 
 =head2 redirect
 
