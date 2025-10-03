@@ -45,15 +45,15 @@ ADJUST {
     if (exists $config->{templates_dir}) {
         if (ref $config->{templates_dir} eq ref []) {
             $self->add_directory($_)
-                for @{ $config->{templates_dir} };
+                for reverse @{ $config->{templates_dir} };
         }
     } else {
-        $self->add_directory('templates');
         $self->add_directory('js');
+        $self->add_directory('templates');
     }
 }
 
-method add_directory        ($d) { push @include, $app->path($d) }
+method add_directory        ($d) { unshift @include, $app->path($d) }
 method clear_directories         { @include = () }
 method set_template         ($t) { $template = $self->_ext($t) }
 method add_before_template  ($p) { push @before_template, $self->_ext($p) }
@@ -388,9 +388,11 @@ Adds the passed class name to the list of L<C<classes>|/classes>.
 
     method add_directory ($directory)
 
-Adds the passed directory as a include path. This method can be called
-multiple times to add multiple paths. Emptying the include list is
-possible with L<C<clear_directories>|/clear_directories>.
+Adds the given directory to the include path, giving it precedence over
+previously added ones. This method can be called multiple times to build
+a search path where the most recently added directory is checked first.
+The include list can be emptied with
+L<C<clear_directories>|/clear_directories>.
 
 See also: L<C<templates_dir>|/templates_dir>.
 
