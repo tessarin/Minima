@@ -1,6 +1,6 @@
 use v5.40;
 
-package Minima v0.7.2;
+package Minima v0.7.3;
 
 use Minima::Setup;
 

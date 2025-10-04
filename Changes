@@ -1,3 +1,14 @@
+v0.7.3  2025-10-04
+
+        [Fixes]
+        - Fix Static root path in app.psgi template. The middleware now
+          correctly points to _static/_ instead of using the obsolete
+          `$Dir` variable.
+
+        [Changes]
+        - Adjust indentation in the generated main.css template for
+          consistency with style conventions.
+
 v0.7.2  2025-10-03
 
         [Changes]
