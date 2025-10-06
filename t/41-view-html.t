@@ -163,9 +163,11 @@ my $app = Minima::App->new(
     $view->add_class('a');
     $view->add_class('b');
     is( $view->render, 'a b', 'outputs proper class set' );
+
+    delete $config->{tt};
 }
 
-# Includes
+# Includes before & after template
 {
     my $view = Minima::View::HTML->new(app => $app);
     $view->set_template('home');
@@ -182,6 +184,27 @@ my $app = Minima::App->new(
     $view->add_after_template('post1');
     $view->add_after_template('post2');
     is( $view->render, '12@34', 'includes extra templates correctly' );
+}
+
+# Handles extensions on body open & close
+{
+    my $view = Minima::View::HTML->new(app => $app);
+    $view->set_template('extras');
+    $view->add_directory('.');
+
+    my $extras = $dir->child('extras.ht');
+    $extras->spew(<<~T);
+        %% foreach i in view.body_open ; include \$i ; end
+        %% foreach i in view.body_close; include \$i ; end
+        T
+
+    my $i = 0;
+    $dir->child($_)->spew(++$i) for qw/ o1.ht o2.tpl c1.ht /;
+
+    $view->add_body_open('o1');
+    $view->add_body_open('o2.tpl');
+    $view->add_body_close('c1');
+    is( $view->render, '123', 'handles extensions on body extras' );
 }
 
 chdir;

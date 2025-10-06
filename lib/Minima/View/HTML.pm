@@ -81,10 +81,18 @@ method set_compound_title ($t, $d = undef)
 method set_description      ($d) { $content{description} = $d }
 method add_header_script    ($s) { push @{$content{header_scripts}}, $s }
 method add_header_css       ($c) { push @{$content{header_css}}, $c }
-method add_body_open        ($p) { push @{$content{body_open}}, $p }
-method add_body_close       ($p) { push @{$content{body_close}}, $p }
 method add_script           ($s) { push @{$content{scripts}}, $s }
 method add_class            ($c) { push @{$content{classes}}, $c }
+
+method add_body_open ($p)
+{
+    push @{$content{body_open}}, $self->_ext($p)
+}
+
+method add_body_close ($p)
+{
+    push @{$content{body_close}}, $self->_ext($p)
+}
 
 method prepare_response ($response)
 {
@@ -371,12 +379,20 @@ Adds the passed template name to the pre-template list.
 Adds the passed template name to the template list for the insertion
 point immediatelly before the closing C<E<lt>/bodyE<gt>> tag.
 
+If no file extension is provided, the one defined by the
+L<C<template_ext>|/template_ext> configuration key is automatically
+added.
+
 =head2 add_body_open
 
     method add_body_open ($template)
 
 Adds the passed template name to the template list for the insertion
 point immediatelly after the opening C<E<lt>bodyE<gt>> tag.
+
+If no file extension is provided, the one defined by the
+L<C<template_ext>|/template_ext> configuration key is automatically
+added.
 
 =head2 add_class
 
