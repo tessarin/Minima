@@ -6,6 +6,7 @@ class Minima::App;
 use Carp;
 use Minima::Router;
 use Path::Tiny ();
+use Plack::Response;
 use Plack::Util;
 use FindBin;
 
@@ -42,6 +43,7 @@ method run
     my $m = $router->match($env);
 
     return $self->_not_found unless $m;
+    return $self->_redirect($m) if $m->{redirect};
 
     my $class  = $m->{controller};
     my $method = $m->{action};
@@ -125,16 +127,6 @@ method _load_class ($class)
     }
 }
 
-method _read_config
-{
-    # Ensure base_dir is set and absolute
-    my $base = $config->{base_dir} // '.';
-    $config->{base_dir} = Path::Tiny::path($base)->absolute;
-
-    $self->_load_routes;
-    $self->_set_version;
-}
-
 method _load_routes
 {
     $router->clear_routes;
@@ -164,6 +156,24 @@ method _load_routes
     # Read routes
     $file = $self->path($file);
     $router->read_file($file);
+}
+
+method _redirect ($m)
+{
+    my $res = Plack::Response->new;
+
+    $res->redirect($m->{redirect}, $m->{redirect_status});
+    $res->finalize;
+}
+
+method _read_config
+{
+    # Ensure base_dir is set and absolute
+    my $base = $config->{base_dir} // '.';
+    $config->{base_dir} = Path::Tiny::path($base)->absolute;
+
+    $self->_load_routes;
+    $self->_set_version;
 }
 
 method _set_version

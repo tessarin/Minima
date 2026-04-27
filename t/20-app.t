@@ -235,6 +235,38 @@ my $env = { PATH_INFO => '/' };
     );
 }
 
+# Routes redirect
+{
+    my $r_env = { PATH_INFO => '/old', REQUEST_METHOD => 'GET' };
+    my $routes = $dir->child('etc/routes.map');
+
+    $routes->spew(<<~'EOF'
+        GET /old @redirect /new
+        GET /gone @rp /here
+        EOF
+    );
+
+    my $app = Minima::App->new(environment => $r_env);
+    my $response = $app->run;
+
+    is( $response->[0], 302, 'routes temporary redirect' );
+    is(
+        +{ $response->[1]->@* }->{Location},
+        '/new',
+        'sets temporary redirect location'
+    );
+
+    $r_env->{PATH_INFO} = '/gone';
+    $response = $app->run;
+
+    is( $response->[0], 301, 'routes permanent redirect alias' );
+    is(
+        +{ $response->[1]->@* }->{Location},
+        '/here',
+        'sets permanent redirect location'
+    );
+}
+
 # Routes with custom controller prefixes
 {
     my $routes = $dir->child('etc/routes.map');

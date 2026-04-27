@@ -72,6 +72,7 @@ my $match = $r->match('/');
 is( $match->{controller}, 'C', 'returns correct not found controller' );
 is( $match->{action}, 'N', 'returns correct not found action' );
 
+# Normal
 $routes->spew(<<~EOF
     * / C H
     EOF
@@ -119,6 +120,61 @@ is( $match->{action}, 'H', 'returns correct action match' );
     $env->{REQUEST_METHOD} = 'HEAD';
     $match = $r->match($env);
     is( $match, undef, 'does not match HEAD on exclusive GET' );
+}
+
+# Commands
+{
+    $routes->spew(<<~\EOF);
+    * / @c a
+    EOF
+
+    $r->clear_routes;
+    like(
+        dies { $r->read_file($routes) },
+        qr/unknown.*command/i,
+        'dies for unknown route command'
+    );
+}
+
+# Redirects
+{
+    $routes->spew(<<~\EOF
+        GET /old @redirect /new
+        GET /tmp @r /target
+        GET /gone @redirect_permanent /here
+        GET /kept @rp /there
+        EOF
+    );
+    $r->clear_routes;
+    $r->read_file($routes);
+
+    my $match = $r->match({
+        PATH_INFO      => '/old',
+        REQUEST_METHOD => 'GET',
+    });
+    is( $match->{redirect}, '/new', 'matches redirect destination' );
+    is( $match->{redirect_status}, 302, 'sets temporary redirect status' );
+
+    $match = $r->match({
+        PATH_INFO      => '/tmp',
+        REQUEST_METHOD => 'GET',
+    });
+    is( $match->{redirect}, '/target', 'matches short redirect alias' );
+    is( $match->{redirect_status}, 302, 'sets short redirect status' );
+
+    $match = $r->match({
+        PATH_INFO      => '/gone',
+        REQUEST_METHOD => 'GET',
+    });
+    is( $match->{redirect}, '/here', 'matches permanent redirect destination' );
+    is( $match->{redirect_status}, 301, 'sets permanent redirect status' );
+
+    $match = $r->match({
+        PATH_INFO      => '/kept',
+        REQUEST_METHOD => 'GET',
+    });
+    is( $match->{redirect}, '/there', 'matches short permanent redirect alias' );
+    is( $match->{redirect_status}, 301, 'sets short permanent redirect status' );
 }
 
 done_testing;
