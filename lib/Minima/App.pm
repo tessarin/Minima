@@ -270,7 +270,9 @@ unless it is explicitly set in the configuration.
 
 The default prefix prepended to controller names in the routes file when
 using the C<:> shortcut. See also: L<"Controller" in
-Minima::Router|Minima::Router/Controller>.
+Minima::Router|Minima::Router/Controller>. Pass only the namespace
+prefix itself, without trailing C<:> or C<::>; the router adds C<::>
+automatically.
 
 =item C<routes>
 

@@ -222,8 +222,10 @@ reference with the key C<controller>.
 =item C<:Main>
 
 A controller name beginning with C<:>. In this form, a prefix
-(defaulting to C<Controller:>) is automatically prepended. This prefix
-can be customized using L<C<set_prefix>|/set_prefix>.
+(defaulting to C<Controller>) is automatically prepended, with the C<::>
+package separator added by the router. For example, C<:Main> maps to
+C<Controller::Main>. This prefix can be customized using
+L<C<set_prefix>|/set_prefix>.
 
 B<Note:> When using L<Minima::Router> through the default Minima::App,
 the controller prefix may also be set via the
@@ -347,6 +349,8 @@ more than one file.
 
 Sets the prefix for completing controller names when using the C<:>
 notation. Defaults to C<Controller>. See L</Controller> for details.
+Pass only the namespace prefix itself, without trailing C<:> or C<::>;
+the router adds C<::> automatically.
 
 If you are using Minima::Router through the default L<Minima::App>
 integration, you do not need to call this method directly. Instead, set

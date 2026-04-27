@@ -43,6 +43,23 @@ is(
     'adds default prefix'
 );
 
+$routes->spew(<<~EOF
+    * / ::C A
+    EOF
+);
+$r->clear_routes;
+$r->read_file($routes);
+$prefix_match = $r->match('/');
+is(
+    $prefix_match->{controller},
+    'Controller::C',
+    'treats multiple shortcut colons like one'
+);
+
+$routes->spew(<<~EOF
+    * / :C A
+    EOF
+);
 $r->set_prefix('SecretPrefix');
 $r->clear_routes;
 $r->read_file($routes);
