@@ -1,9 +1,12 @@
-# Build
+# Perl dist
+Makefile
+Makefile.old
+MANIFEST
+MANIFEST.bak
+META.*
+MYMETA.*
+.build/
+cover_db/
 blib/
-_build/
-Build
-/MYMETA*
-/META*
-/MANIFEST
-/MANIFEST.bak
-/cover_db/
+pm_to_blib
+/Minima-*
