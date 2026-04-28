@@ -3,6 +3,7 @@ use experimental 'class';
 
 class Minima::Controller;
 
+use Carp;
 use Data::Dumper;
 use Encode qw(decode);
 use Hash::MultiValue;
@@ -11,6 +12,8 @@ use Minima::View::PlainText;
 use Plack::Request;
 use Plack::Response;
 use Scalar::Util qw(reftype);
+
+use constant k_FLASH => 'minima.flash';
 
 field $env             :reader;
 field $app      :param :reader;
@@ -80,6 +83,28 @@ method json_body
     }
 
     return $data;
+}
+
+method flash ($type = undef, $message = undef)
+{
+    my $session = $request->session;
+    my $options = $request->session_options;
+
+    croak <<~M unless $session;
+        flash requires session middleware.
+        Please enable Plack::Middleware::Session.
+        M
+
+    # pop
+    unless (defined $type) {
+        return undef unless exists $session->{+k_FLASH};
+        delete $options->{no_store} if $options;
+        return delete $session->{+k_FLASH};
+    }
+
+    # push
+    delete $options->{no_store} if $options;
+    push $session->{+k_FLASH}->{$type}->@*, $message;
 }
 
 method hello
@@ -280,6 +305,35 @@ If the C<Content-Type> is not C<application/json>, the body is empty,
 the declared C<Content-Length> is invalid, or the JSON cannot be parsed,
 the method returns C<undef>. Otherwise, it returns the decoded Perl
 structure (typically a hash or array reference).
+
+=head2 flash
+
+    method flash ($type = undef, $message = undef)
+
+Stores a message in the session to be read during a later request.
+Messages are grouped by type; each call appends the message to an array
+under that type.
+
+Calling C<flash> without arguments returns the stored message hash and
+removes it from the session. If there are no stored messages, it returns
+C<undef>.
+
+Example usage:
+
+    $self->flash(success => 'Saved');
+    $self->flash(success => 'Published');
+    $self->flash(error => 'Could not save');
+
+    my $messages = $self->flash;
+    # $messages contains:
+    # {
+    #     success => [ 'Saved', 'Published' ],
+    #     error   => [ 'Could not save' ],
+    # }
+
+This method requires session middleware that provides C<psgix.session>,
+such as L<Plack::Middleware::Session>. If no session
+is available, it throws an exception.
 
 =head2 redirect
 

@@ -162,4 +162,72 @@ use utf8;
     is( $c->json_body, undef, 'invalid JSON returns undef' );
 }
 
+# Flash messages
+{
+    my $env = {};
+    my $app = Minima::App->new(environment => $env);
+    my $c   = Minima::Controller->new(app => $app);
+
+    # no session
+    like(
+        dies { $c->flash(a => 0) },
+        qr/requires session/i,
+        'fails if no session is present'
+    );
+
+    # enable sessions
+    my $session = {};
+    my $options = { no_store => 1 };
+    $env->{'psgix.session'} = $session;
+    $env->{'psgix.session.options'} = $options;
+
+    # empty
+    is( $c->flash, undef, 'pops undef when no messages exist');
+    is(
+        $options->{no_store},
+        1,
+        'empty pop does not force session storage'
+    );
+
+    # add messages
+    $c->flash(a => 1);
+    is(
+        $session->{Minima::Controller::k_FLASH},
+        { a => [ 1 ] },
+        'stores flash messages successfully',
+    );
+    ok(
+        !exists $options->{no_store},
+        'adding flash marks session for storage',
+    );
+
+    $c->flash(a => 2);
+    $c->flash(b => 3);
+
+    is(
+        scalar(keys $session->{Minima::Controller::k_FLASH}->%*),
+        2,
+        'handles grouping keys'
+    );
+
+    is(
+        scalar($session->{Minima::Controller::k_FLASH}{a}->@*),
+        2,
+        'handles grouping values'
+    );
+
+    # remove messages
+    $options->{no_store} = 1;
+    $c->flash;
+    is(
+        $session->{Minima::Controller::k_FLASH},
+        undef,
+        'removes flash messages properly'
+    );
+    ok(
+        !exists $options->{no_store},
+        'removing marks session for storage',
+    );
+}
+
 done_testing;
