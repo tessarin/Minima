@@ -228,7 +228,7 @@ Minima::Controller - Base class for controllers used with Minima
 Serving as a base class to controllers used with L<Minima>, this class
 provides the basic infrastructure for any type of controller. It is
 built around L<Plack::Request> and L<Plack::Response> objects, allowing
-subclasses to interactly directly with Plack.
+subclasses to interact directly with Plack.
 
 Minima::Controller also keeps references to the L<Minima::App> and Plack
 environment. Additionally, it retains data received from the router,
@@ -243,6 +243,11 @@ Minima::App|Minima::App/run>.
 This base class is not connected to any view, which is left to methods
 or subclasses. However, it sets a default C<Content-Type> header for the
 response as C<'text/plain; charset=utf-8'> and response code to 200.
+
+Controllers can also carry transient messages to a later request with
+L<C<flash>|/flash>. This is useful after redirects: one action stores a
+success or error message in the session, and a later action reads and
+consumes it for rendering.
 
 =head1 CONFIGURATION
 
