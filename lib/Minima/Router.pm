@@ -13,7 +13,10 @@ field $prefix = 'Controller';
 
 method match ($env)
 {
-    $router->match($env) // $special{not_found};
+    my $match = $router->match($env);
+    return $match if defined $match;
+
+    $self->not_found_route;
 }
 
 method read_file ($file)
@@ -94,11 +97,6 @@ method _connect
     $router->connect(@_);
 }
 
-method error_route
-{
-    $special{server_error}
-}
-
 method clear_routes
 {
     $router  = Router::Simple->new;
@@ -109,6 +107,9 @@ method set_prefix ($new)
 {
     $prefix = $new;
 }
+
+method not_found_route  { $special{not_found} }
+method error_route      { $special{server_error} }
 
 __END__
 
@@ -335,6 +336,14 @@ returns C<undef>.
 Note that this does not call the controller. It's up to the user to do
 that in order to perform the intended action. In a typical application,
 L<Minima::App> will perform the call.
+
+=head2 not_found_route
+
+    method not_found_route ()
+
+Returns the controller-action pair registered with the
+L<C<not_found>|/not_found> directive. If nothing was registered, returns
+C<undef>.
 
 =head2 read_file
 

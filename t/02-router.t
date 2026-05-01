@@ -71,6 +71,8 @@ is(
 );
 
 # Specials
+is( $r->not_found_route, undef,
+    'returns undef for no not found route registered' );
 is( $r->error_route, undef,
     'returns undef for no error route registered' );
 
@@ -86,9 +88,13 @@ my $error_r = $r->error_route;
 is( $error_r->{controller}, 'C', 'returns correct error controller' );
 is( $error_r->{action}, 'E', 'returns correct error action' );
 
+my $not_found = $r->not_found_route;
+is( $not_found->{controller}, 'C', 'returns correct not found controller' );
+is( $not_found->{action}, 'N', 'returns correct not found action' );
+
 my $match = $r->match('/');
-is( $match->{controller}, 'C', 'returns correct not found controller' );
-is( $match->{action}, 'N', 'returns correct not found action' );
+is( $match->{controller}, 'C', 'also returns not found controller for bad route' );
+is( $match->{action}, 'N', 'also returns not found action for bad route' );
 
 my $undef = $r->match('u');
 is( $undef->{controller}, undef, 'works with empty controller' );
