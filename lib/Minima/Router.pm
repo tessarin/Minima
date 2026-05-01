@@ -28,6 +28,7 @@ method read_file ($file)
         next if /^\s*#|^\s*$/;
 
         # Extract data
+        $_ = trim $_;
         my ($method, $pattern, $controller, $action) = split;
 
         # Build destination and options

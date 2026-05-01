@@ -75,6 +75,7 @@ is( $r->error_route, undef,
     'returns undef for no error route registered' );
 
 $routes->spew(<<~EOF
+    * u
     @ not_found C N
     @ server_error C E
     EOF
@@ -88,6 +89,10 @@ is( $error_r->{action}, 'E', 'returns correct error action' );
 my $match = $r->match('/');
 is( $match->{controller}, 'C', 'returns correct not found controller' );
 is( $match->{action}, 'N', 'returns correct not found action' );
+
+my $undef = $r->match('u');
+is( $undef->{controller}, undef, 'works with empty controller' );
+is( $undef->{action}, undef, 'works with empty action' );
 
 # Normal
 $routes->spew(<<~EOF
