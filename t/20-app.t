@@ -235,6 +235,49 @@ my $env = { PATH_INFO => '/' };
     );
 }
 
+# Action hooks
+{
+    local @INC = ( $dir->absolute, @INC );
+    my $a_env = { };
+    my $hooked_controller = $dir->child('H.pm');
+    $hooked_controller->spew(<<~\EOF);
+        use v5.40;
+        use experimental 'class';
+        class H {
+            field $app :param;
+            field $route :param;
+
+            method before_action ($break) { $break eq 'halt' ? 'halt' : undef }
+            method after_action ($r) { $r->[0]++ if $route->{action} eq 'alter' }
+            method normal { [1] }
+            method alter  { [1] }
+        }
+        EOF
+    my $routes = $dir->child('etc/routes.map');
+    $routes->spew(<<~'EOF'
+        * n H normal
+        * h H halt
+        * a H alter
+        EOF
+    );
+
+    my $app = Minima::App->new(environment => $a_env);
+
+    # no before_action break
+    $a_env->{PATH_INFO} = 'n';
+    is( $app->run, [1], 'before_action passes' );
+
+    # break on before_action
+    $a_env->{PATH_INFO} = 'h';
+    is( $app->run, 'halt', 'before_action can halt normal response' );
+
+    # after_action works
+    $a_env->{PATH_INFO} = 'a';
+    is( $app->run, [2], 'after_action modifies response' );
+
+    $routes->remove;
+}
+
 # Routes redirect
 {
     my $r_env = { PATH_INFO => '/old', REQUEST_METHOD => 'GET' };
@@ -265,6 +308,8 @@ my $env = { PATH_INFO => '/' };
         '/here',
         'sets permanent redirect location'
     );
+
+    $routes->remove;
 }
 
 # Routes with custom controller prefixes
@@ -297,6 +342,8 @@ my $env = { PATH_INFO => '/' };
         qr/SecretPrefix::X/,
         'adds custom controller prefix'
     );
+
+    $routes->remove;
 }
 
 chdir;
