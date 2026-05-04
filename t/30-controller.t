@@ -73,6 +73,39 @@ use utf8;
         12,
         'respects ascii values',
     );
+
+    # _decode doesn't crash on undef
+    is( $c->_decode(undef), undef, '_decode handles undef' );
+}
+
+# Utils
+{
+    my $env = { K => 1 };
+    my $app = Minima::App->new(environment => $env);
+    my $c = Minima::Controller->new(app => $app);
+
+    # print_env in production
+    $ENV{PLACK_ENV} = 'deployment';
+    is(
+        $c->print_env->[0],
+        302,
+        'print_env redirects when in production'
+    );
+
+    # print_env in development
+    delete $ENV{PLACK_ENV};
+    like(
+        $c->print_env->[2][0],
+        qr/K\s*=>\s*1/,
+        'print_env produces proper output'
+    );
+
+    # dd
+    like(
+        $c->dd([0])->[2][0],
+        qr/\[\s*0\s*]/,
+        'dd produces proper output'
+    );
 }
 
 # Trimming params
@@ -86,6 +119,8 @@ use utf8;
             multi => ' 1 ',
             array => [ ' 0 ', ' 1 ' ],
             hash => { key => ' value ' },
+            undef => undef,
+            undef_a => [ undef ],
         )
     };
     my $app = Minima::App->new(environment => $fake_env);
@@ -99,6 +134,15 @@ use utf8;
     is( [ $params->get_all('multi') ], [0,1], 'trims values of multi-keys' );
     is( $params->{array}[1], 1, 'trims elements of array values' );
     is( $params->{hash}{key}, ' value ', 'leaves hash refs untouched' );
+
+    # no exclusions
+    $params = $c->trimmed_params;
+    is( $params->{password}, 'perlclass', 'works on everything if needed' );
+
+    # scalar reference is not a valid exclusion
+    my $pass = 'password';
+    $params = $c->trimmed_params({ exclude => [ \$pass ] });
+    is( $params->{password}, 'perlclass', 'scalar ref is not a valid exclusion' );
 }
 
 # UTF-8 JSON decoding
@@ -129,6 +173,9 @@ use utf8;
     my $c   = Minima::Controller->new(app => $app);
 
     is( $c->json_body, undef, 'wrong content-type returns undef' );
+
+    delete $env->{CONTENT_TYPE};
+    is( $c->json_body, undef, 'inexisting content-type returns undef' );
 }
 
 # Broken content-length
@@ -146,6 +193,15 @@ use utf8;
         qr/content-length/i,
         'dies on broken content-length'
     );
+}
+
+# Broken body
+{
+    my $env = { CONTENT_TYPE => 'application/json' };
+    my $app = Minima::App->new(environment => $env);
+    my $c   = Minima::Controller->new(app => $app);
+
+    is( $c->json_body, undef, 'no body returns undef' );
 }
 
 # Invalid JSON
@@ -227,6 +283,21 @@ use utf8;
     ok(
         !exists $options->{no_store},
         'removing marks session for storage',
+    );
+
+    # no options available
+    delete $env->{'psgix.session.options'};
+    $c->flash(c => 4);
+    is(
+        $session->{Minima::Controller::k_FLASH},
+        { c => [ 4 ] },
+        'stores messages even without options object'
+    );
+    $c->flash;
+    is(
+        $session->{Minima::Controller::k_FLASH},
+        undef,
+        'removes messages even without options object'
     );
 }
 

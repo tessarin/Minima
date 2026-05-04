@@ -48,9 +48,9 @@ method trimmed_params ($options = {})
             my $skip = 0;
             for my $pat (@$exclude) {
                 if (ref $pat && reftype $pat eq 'REGEXP') {
-                    if (defined $k && $k =~ $pat) { $skip = 1; last }
+                    if ($k =~ $pat) { $skip = 1; last }
                 } else {
-                    if (defined $k && $k eq $pat) { $skip = 1; last }
+                    if ($k eq $pat) { $skip = 1; last }
                 }
             }
             if (!$skip) {
@@ -71,7 +71,7 @@ method json_body
     my $c_type = $request->content_type // '';
     return undef unless $c_type =~ m|\Aapplication/json\b|i;
 
-    my $body = $request->content // '';
+    my $body = $request->content;
     return undef unless length $body;
 
     my $data;
