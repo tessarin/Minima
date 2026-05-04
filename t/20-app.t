@@ -233,6 +233,46 @@ my $env = { PATH_INFO => '/' };
         qr/^500/,
         're-throws error on development'
     );
+
+    # We're in production and there is no error page
+    $ENV{PLACK_ENV} = 'deployment';
+    $routes->spew('* /d C unimplemented');
+    $app->_load_routes;
+    like(
+        dies { $app->run },
+        qr/dispatch failed/i,
+        're-throws even in production if no error route is set'
+    );
+
+    # Incomplete route
+    $routes->spew(<<~EOF);
+        * a C
+        * b
+        EOF
+    $app->_load_routes;
+    $r_env->{PATH_INFO} = 'a';
+    like(
+        dies { $app->run },
+        qr/no action configured/i,
+        'dies if action is undef'
+    );
+    $r_env->{PATH_INFO} = 'b';
+    like(
+        dies { $app->run },
+        qr/no controller/i,
+        'dies if controller is undef'
+    );
+
+    # Simulate a defined but empty action
+    like(
+        dies {
+            $app->_setup_controller ({
+                    controller => 'C', action => ''
+                })
+        },
+        qr/no action configured/i,
+        'dies if action is empty'
+    );
 }
 
 # Action hooks
@@ -251,6 +291,7 @@ my $env = { PATH_INFO => '/' };
             method after_action ($r) { $r->[0]++ if $route->{action} eq 'alter' }
             method normal { [1] }
             method alter  { [1] }
+            method halt   {     }
         }
         EOF
     my $routes = $dir->child('etc/routes.map');

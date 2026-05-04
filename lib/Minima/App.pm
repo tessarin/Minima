@@ -40,31 +40,24 @@ method run
 {
     croak "Can't run without an environment.\n" unless defined $env;
 
-    my $m = $router->match($env);
-
-    return $self->_not_found unless $m;
-    return $self->_redirect($m) if $m->{redirect};
-
-    my $class  = $m->{controller};
-    my $method = $m->{action};
-
-    $self->_load_class($class);
-
-    my $controller = $class->new(
-        app => $self,
-        route => $m,
-    );
-
+    my $match = $router->match($env);
     my $response;
+    my $controller;
+    my $action;
+
+    return $self->_not_found unless $match;
+    return $self->_redirect($match) if $match->{redirect};
 
     try {
+        ($controller, $action) = $self->_setup_controller($match);
+
         # before_action
         if ($controller->can('before_action')) {
-            my $res = $controller->before_action($method);
+            my $res = $controller->before_action($action);
             return $res if $res; # halt
         }
         # actual action
-        $response = $controller->$method;
+        $response = $controller->$action;
         # after action
         if ($controller->can('after_action')) {
             $controller->after_action($response);
@@ -74,14 +67,8 @@ method run
         # Something failed. If we're in production
         # and there is a server_error route, try it.
         if (!$self->development && $err) {
-            $class  = $err->{controller};
-            $method = $err->{action};
-            $self->_load_class($class);
-            $controller = $class->new(
-                app => $self,
-                route => $err,
-            );
-            $response = $controller->$method($e);
+            ($controller, $action) = $self->_setup_controller($err);
+            $response = $controller->$action($e);
         } else {
             # Nothing can be done, re-throw
             die $e;
@@ -105,6 +92,31 @@ method run
     }
 
     return $response;
+}
+
+method _setup_controller ($match)
+{
+    my $class  = $match->{controller};
+    my $method = $match->{action};
+
+    die "Route dispatch failed: "
+        . "no controller defined for `$env->{PATH_INFO}`.\n"
+        unless defined $class;
+
+    die "Route dispatch failed: no action configured for `$class`.\n"
+        unless defined $method && length $method;
+
+    $self->_load_class($class);
+
+    my $controller = $class->new(
+        app   => $self,
+        route => $match,
+    );
+
+    die "Route dispatch failed: `$class` does not implement action `$method`.\n"
+        unless $controller->can($method);
+
+    ( $controller, $method );
 }
 
 method _not_found
